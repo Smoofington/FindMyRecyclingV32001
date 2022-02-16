@@ -6,11 +6,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
@@ -21,7 +23,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             FindMyRecyclingTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
+                Surface(color = MaterialTheme.colors.background,
+                modifier = Modifier.fillMaxWidth()) {
                     Greeting("Android")
                 }
             }
@@ -43,14 +46,16 @@ fun RecycleSearch(name: String) {
         OutlinedTextField(
             value = recyclable,
             onValueChange = {recyclable = it},
-            label = { Text(stringResource(R.string.recyclable)) }
+            label = { Text(stringResource(R.string.recyclable)) },
+            modifier = Modifier.fillMaxWidth()
         )
 
 
         OutlinedTextField(
             value = location,
             onValueChange = { location = it },
-            label = { Text(stringResource(R.string.location)) }
+            label = { Text(stringResource(R.string.location)) },
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
