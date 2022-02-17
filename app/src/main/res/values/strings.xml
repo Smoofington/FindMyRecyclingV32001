@@ -2,4 +2,7 @@
     <string name="app_name">FindMyRecycling</string>
     <string name="recyclable">Recyclable</string>
     <string name="location">Location</string>
+    <string name="profile">Profile</string>
+    <string name="mySavedLocations">My Saved Locations</string>
+    <string name="mySavedSearches">My Saved Searches</string>
 </resources>

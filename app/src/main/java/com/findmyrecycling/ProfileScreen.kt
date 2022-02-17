@@ -1,6 +1,5 @@
 package com.findmyrecycling
 
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,49 +13,55 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 
-class MainActivity : ComponentActivity() {
+class ProfileScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             FindMyRecyclingTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background,
-                modifier = Modifier.fillMaxWidth()) {
-                    RecycleSearch("Android")
+                    modifier = Modifier.fillMaxWidth()) {
+                    ProfileOptions("Android")
                 }
             }
         }
     }
 }
-
 @Composable
-fun RecycleSearch(name: String) {
-    var recyclable by remember{ mutableStateOf("")}
-    var location by remember{ mutableStateOf("")}
+fun ProfileOptions(name: String) {
+    var profile by remember{ mutableStateOf("")}
+    var mySavedLocations by remember{ mutableStateOf("")}
+    var mySavedSearches by remember{ mutableStateOf("")}
 
     Column {
         OutlinedTextField(
-            value = recyclable,
-            onValueChange = {recyclable = it},
-            label = { Text(stringResource(R.string.recyclable)) },
+            value = profile,
+            onValueChange = {profile = it},
+            label = { Text(stringResource(R.string.profile)) },
             modifier = Modifier.fillMaxWidth()
         )
 
 
         OutlinedTextField(
-            value = location,
-            onValueChange = { location = it },
-            label = { Text(stringResource(R.string.location)) },
+            value = mySavedLocations,
+            onValueChange = { mySavedLocations = it },
+            label = { Text(stringResource(R.string.mySavedLocations)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = mySavedSearches,
+            onValueChange = { mySavedSearches = it },
+            label = { Text(stringResource(R.string.mySavedSearches)) },
             modifier = Modifier.fillMaxWidth()
         )
 
     }
 }
-
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+fun DefaultPreview2() {
     FindMyRecyclingTheme {
-        RecycleSearch("Android")
+        ProfileOptions("Android")
     }
 }
