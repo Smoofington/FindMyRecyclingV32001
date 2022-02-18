@@ -5,4 +5,10 @@
     <string name="profile">Profile</string>
     <string name="mySavedLocations">My Saved Locations</string>
     <string name="mySavedSearches">My Saved Searches</string>
+    <string name="mySavedLocation1">Location 1</string>
+    <string name="mySavedLocation2">Location 2</string>
+    <string name="mySavedLocation3">Location 3</string>
+    <string name="mySavedSearch1">Search 1</string>
+    <string name="mySavedSearch2">Search 2</string>
+    <string name="mySavedSearch3">Search 3</string>
 </resources>
