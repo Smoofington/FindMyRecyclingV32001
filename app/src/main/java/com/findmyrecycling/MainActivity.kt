@@ -2,6 +2,7 @@ package com.findmyrecycling
 
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
@@ -23,6 +25,7 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MaterialTheme.colors.background,
                 modifier = Modifier.fillMaxWidth()) {
                     RecycleSearch("Android")
+
                 }
             }
         }
@@ -33,6 +36,7 @@ class MainActivity : ComponentActivity() {
 fun RecycleSearch(name: String) {
     var recyclable by remember{ mutableStateOf("")}
     var location by remember{ mutableStateOf("")}
+    val context = LocalContext.current
 
     Column {
         OutlinedTextField(
@@ -49,7 +53,12 @@ fun RecycleSearch(name: String) {
             label = { Text(stringResource(R.string.location)) },
             modifier = Modifier.fillMaxWidth()
         )
-
+        Button (
+            onClick = {
+                Toast.makeText(context, "SS", Toast.LENGTH_LONG).show()
+            },
+        content = {Text(text = "Profile")}
+        )
     }
 }
 
