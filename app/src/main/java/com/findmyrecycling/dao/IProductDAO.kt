@@ -1,10 +1,12 @@
 package com.findmyrecycling.dao
 
+
+import com.findmyrecycling.dto.Product
 import retrofit2.Call
 import retrofit2.http.GET
 
 class IProductDAO {
-    @GET("/perl/mobile/viewplantsjsonarray.pl")
-    fun getAllProducts() : Call<ArrayList<Products>>
+    @GET()
+    fun getAllProducts() : Call<ArrayList<Product>>
 
 }
