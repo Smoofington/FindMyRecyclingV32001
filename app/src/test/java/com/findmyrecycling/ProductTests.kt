@@ -36,7 +36,7 @@ class ProductTests {
         Assert.assertTrue(allProducts!!.isNotEmpty())
         var containsMotorOil = false
         allProducts!!.forEach {
-            if (it.product.equal(("motor oil"))){
+            if (it.product.equals(("motor oil"))){
                 containsMotorOil = true
             }
         }
