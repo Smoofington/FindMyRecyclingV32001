@@ -5,6 +5,6 @@ import retrofit2.Call
 import retrofit2.http.GET
 
 interface IProductDAO {
-    @GET("/mMUesHYPkXjaFGfS/arcgis/rest/services/Recycling_Depot_Locations/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
+    @GET("Smoofington/FindMyRecyclingV32001/master/findmyrecyclingJSON.md")
     fun getAllProducts() : Call<ArrayList<Product>>
 }

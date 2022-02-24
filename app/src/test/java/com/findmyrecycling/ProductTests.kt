@@ -3,7 +3,7 @@ package com.findmyrecycling
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.findmyrecycling.dto.Product
 import com.findmyrecycling.service.ProductService
-import junit.framework.Assert
+import junit.framework.Assert.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -17,10 +17,10 @@ class ProductTests {
     var allProducts : List<Product>? = ArrayList<Product>()
 
     @Test
-    suspend fun `Given product data are available when I search for motor oil then I should receive A facility to recycle motor oil` () = runTest {
+    fun `Given product data are available when I search for cell phone then I should receive A facility to recycle cell phones` () = runTest {
         givenProductServiceIsInitalized()
         whenProductDataAreReadAndParsed()
-        thenTheProductCollectionShouldContainFacilitiesToRecycleMotorOil()
+        thenTheProductCollectionShouldContainFacilitiesToRecycleCellPhones()
     }
 
     private fun givenProductServiceIsInitalized() {
@@ -31,16 +31,17 @@ class ProductTests {
         allProducts = productService.fetchProducts()
     }
 
-    private fun thenTheProductCollectionShouldContainFacilitiesToRecycleMotorOil() {
-        Assert.assertNotNull(allProducts)
-        Assert.assertTrue(allProducts!!.isNotEmpty())
-        var containsMotorOil = false
+    private fun thenTheProductCollectionShouldContainFacilitiesToRecycleCellPhones() {
+        assertNotNull(allProducts)
+        assertTrue(allProducts!!.isNotEmpty())
+        var containsCellPhones = false
         allProducts!!.forEach {
-            if (it.product.equals(("motor oil"))){
-                containsMotorOil = true
+            if (it.product.equals(("Cell Phones"))){
+                containsCellPhones = true
             }
         }
+        assertTrue(containsCellPhones)
     }
-    assertTrue(containsMotorOil)
+
 
 }
