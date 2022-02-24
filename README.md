@@ -47,25 +47,25 @@ Product names are in English
 
 **Given** a feed of product data is available  
 
-**When** I search for “motor oil”  
+**When** I search for “Cell Phone”  
 
 **Then** I should receive at least one result with these attributes   
 
-	A facility to recycle motor oil  
+	A facility to recycle cell phones  
 	
 1.2  
 
 **Given** a feed of product data is available  
 
-**When** I search “fluid”  
+**When** I search “batteries”  
 
 **Then** I should receive at least one result with these attributes  
 
-	A facility to recycle Transmission fluid  
+	A facility to recycle Rechargable Batteries  
   
 **And**  
 
-	A facility to recycle Brake fluid  
+	A facility to recycle Lead Acid Batteries  
   
 1.3  
 
