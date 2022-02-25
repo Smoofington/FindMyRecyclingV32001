@@ -5,16 +5,21 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.findmyrecycling.ui.theme.BarGray
+import com.findmyrecycling.ui.theme.Beigeish
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
+import com.findmyrecycling.ui.theme.RecyclingGreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,8 +27,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             FindMyRecyclingTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background,
+                Surface(color = MaterialTheme.colors.surface,
                 modifier = Modifier.fillMaxWidth()) {
+                    //TopText("WWW")
                     RecycleSearch("Android")
 
                 }
@@ -31,7 +37,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+@Composable
+fun TopText(name: String) {
 
+    Text(text = "Find My Recycling", color = Beigeish)
+    //Modifier.background(color = RecyclingGreen)
+}
 @Composable
 fun RecycleSearch(name: String) {
     var recyclable by remember{ mutableStateOf("")}
@@ -39,11 +50,28 @@ fun RecycleSearch(name: String) {
     val context = LocalContext.current
 
     Column {
+
+        Row {
+
+            TopText("WWW")
+            Button (
+                onClick = {
+                    Toast.makeText(context, "SS", Toast.LENGTH_LONG).show()
+                },
+                content = {Text(text = "Profile")},
+                modifier = Modifier.padding(70.dp, 0.dp)
+            )
+        }
+
         OutlinedTextField(
             value = recyclable,
             onValueChange = {recyclable = it},
             label = { Text(stringResource(R.string.recyclable)) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(BarGray)
+
+
         )
 
 
@@ -51,14 +79,11 @@ fun RecycleSearch(name: String) {
             value = location,
             onValueChange = { location = it },
             label = { Text(stringResource(R.string.location)) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = BarGray)
         )
-        Button (
-            onClick = {
-                Toast.makeText(context, "SS", Toast.LENGTH_LONG).show()
-            },
-        content = {Text(text = "Profile")}
-        )
+
     }
 }
 
@@ -66,6 +91,7 @@ fun RecycleSearch(name: String) {
 @Composable
 fun DefaultPreview() {
     FindMyRecyclingTheme {
+        TopText("WWW")
         RecycleSearch("Android")
     }
 }
