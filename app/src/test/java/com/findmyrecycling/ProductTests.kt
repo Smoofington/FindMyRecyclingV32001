@@ -17,13 +17,26 @@ class ProductTests {
     var allProducts : List<Product>? = ArrayList<Product>()
 
     @Test
-    fun `Given product data are available when I search for cell phone then I should receive A facility to recycle cell phones` () = runTest {
-        givenProductServiceIsInitalized()
+    fun `Given product data are available when I search for cell phone then I should receive a location of recycling center` () = runTest {
+        givenProductServiceIsInitialized()
         whenProductDataAreReadAndParsed()
-        thenTheProductCollectionShouldContainFacilitiesToRecycleCellPhones()
+        thenTheProductCollectionShouldContainCellPhone()
+    }
+    @Test
+    fun `Given product data are available when I search for batteries then I should receive a location of recycling center having lead acid batteries or rechargable batteries` () = runTest {
+        givenProductServiceIsInitialized()
+        whenProductDataAreReadAndParsed()
+        thenTheProductCollectionShouldContainBatteriesTypes()
     }
 
-    private fun givenProductServiceIsInitalized() {
+    @Test
+    fun `Given product data are available when I search for giberish then I should receive nothing` () = runTest {
+        givenProductServiceIsInitialized()
+        whenProductDataAreReadAndParsed()
+        thenTheProductCollectionShouldContainNothing()
+    }
+
+    private fun givenProductServiceIsInitialized() {
         productService = ProductService()
     }
 
@@ -31,17 +44,42 @@ class ProductTests {
         allProducts = productService.fetchProducts()
     }
 
-    private fun thenTheProductCollectionShouldContainFacilitiesToRecycleCellPhones() {
+    private fun thenTheProductCollectionShouldContainCellPhone() {
         assertNotNull(allProducts)
         assertTrue(allProducts!!.isNotEmpty())
-        var containsCellPhones = false
+        var containsCellPhone = false
         allProducts!!.forEach {
-            if (it.product.equals(("Cell Phones"))){
-                containsCellPhones = true
+            if (it.product.equals("Cell Phones")) {
+                containsCellPhone = true
             }
         }
-        assertTrue(containsCellPhones)
+        assertTrue(containsCellPhone)
     }
+
+    private fun thenTheProductCollectionShouldContainBatteriesTypes() {
+        assertNotNull(allProducts)
+        assertTrue(allProducts!!.isNotEmpty())
+        var containsBatteries = false
+        allProducts!!.forEach {
+            if (it.product.equals("Rechargable Batteries") || it.product.equals("Lead Acid Batteries")) {
+                containsBatteries = true
+            }
+        }
+        assertTrue(containsBatteries)
+    }
+
+    private fun thenTheProductCollectionShouldContainNothing() {
+        assertNotNull(allProducts)
+        assertTrue(allProducts!!.isNotEmpty())
+        var containsNothing = false
+        allProducts!!.forEach {
+            if (!it.product.equals("Human Remains")) {
+                containsNothing = true
+            }
+        }
+        assertTrue(containsNothing)
+    }
+
 
 
 }
