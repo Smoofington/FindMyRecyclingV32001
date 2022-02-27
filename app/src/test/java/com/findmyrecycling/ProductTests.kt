@@ -1,13 +1,22 @@
 package com.findmyrecycling
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import com.findmyrecycling.dto.Product
 import com.findmyrecycling.service.ProductService
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.impl.annotations.MockK
 import junit.framework.Assert.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
-import org.junit.Test
+import kotlinx.coroutines.test.setMain
+import org.junit.*
 import org.junit.rules.TestRule
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class ProductTests {
     @get:Rule
@@ -16,6 +25,24 @@ class ProductTests {
     lateinit var productService : ProductService
     var allProducts : List<Product>? = ArrayList<Product>()
 
+    lateinit var mvm : MainViewModel
+
+    @MockK
+    lateinit var mockProductService : ProductService
+
+    private val mainThreadSurrogate = newSingleThreadContext("Main Thread")
+
+    @Before
+    fun initMocksAndMainThread(){
+        MockKAnnotations.init(this)
+        Dispatchers.setMain(mainThreadSurrogate)
+    }
+
+    @After
+    fun TearDown(){
+        Dispatchers.resetMain()
+        mainThreadSurrogate.close()
+    }
     @Test
     fun `Given product data are available when I search for cell phone then I should receive a location of recycling center` () = runTest {
         givenProductServiceIsInitialized()
@@ -29,7 +56,6 @@ class ProductTests {
         thenTheProductCollectionShouldContainBatteriesTypes()
     }
 
-    @Test
     fun `Given product data are available when I search for giberish then I should receive nothing` () = runTest {
         givenProductServiceIsInitialized()
         whenProductDataAreReadAndParsed()
@@ -80,6 +106,52 @@ class ProductTests {
         assertTrue(containsNothing)
     }
 
+    @Test
+    fun `Given a view model with live data when populated with Cell Phones then results show Cell Phone Recycling Location` () = runTest {
+        givenViewModelIsInitializedWithMockData()
+        whenJSONDataAreReadAndParsed()
+        thenResultsShouldContainCellPhoneRecycling()
+    }
+
+    private fun givenViewModelIsInitializedWithMockData() {
+        val products = ArrayList<Product>()
+        products.add(Product("Cell Phones", 1, "Cell Phones" ))
+
+        coEvery {(mockProductService.fetchProducts())} returns products
+
+        mvm = MainViewModel(productService = mockProductService)
+
+    }
+
+    private fun whenJSONDataAreReadAndParsed() {
+        mvm.fetchProducts()
+    }
+
+    private fun thenResultsShouldContainCellPhoneRecycling() {
+
+        var allProducts : List<Product>? = ArrayList<Product>()
+
+        val latch = CountDownLatch(1)
+        //creating a var obersever assigning a static object
+        val observer = object : Observer<List<Product>>{
+            override fun onChanged(recievedProducts: List<Product>?) {
+                allProducts =  recievedProducts
+                latch.countDown()
+                mvm.products.removeObserver(this)
+            }
+        }
+        mvm.products.observeForever(observer)
+        latch.await(10, TimeUnit.SECONDS)
+        assertNotNull(allProducts)
+        assertTrue(allProducts!!.isNotEmpty())
+        var containsCellPhone = false
+        allProducts!!.forEach {
+            if (it.product.equals("Cell Phones")) {
+                containsCellPhone = true
+            }
+        }
+        assertTrue(containsCellPhone)
+    }
 
 
 }
