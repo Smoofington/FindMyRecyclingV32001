@@ -75,7 +75,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsCellPhone = false
         allProducts!!.forEach {
-            if (it.product.equals("Cell Phones")) {
+            if (it.product.equals("Cell Phone")) {
                 containsCellPhone = true
             }
         }
@@ -115,7 +115,7 @@ class ProductTests {
 
     private fun givenViewModelIsInitializedWithMockData() {
         val products = ArrayList<Product>()
-        products.add(Product("Cell Phones", 1, "Cell Phones" ))
+        products.add(Product("Cell Phone", 1, "Cell Phone" ))
 
         coEvery {(mockProductService.fetchProducts())} returns products
 
@@ -146,7 +146,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsCellPhone = false
         allProducts!!.forEach {
-            if (it.product.equals("Cell Phones")) {
+            if (it.product.equals("Cell Phone")) {
                 containsCellPhone = true
             }
         }
