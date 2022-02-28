@@ -109,7 +109,7 @@ class ProductTests {
     @Test
     fun `Given a view model with live data when populated with Cell Phones then results show Cell Phone Recycling Location` () = runTest {
         givenViewModelIsInitializedWithMockData()
-        whenJSONDataAreReadAndParsed()
+        whenProductServiceFetchProductsInvoked()
         thenResultsShouldContainCellPhoneRecycling()
     }
 
@@ -123,7 +123,7 @@ class ProductTests {
 
     }
 
-    private fun whenJSONDataAreReadAndParsed() {
+    private fun whenProductServiceFetchProductsInvoked() {
         mvm.fetchProducts()
     }
 
