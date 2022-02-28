@@ -44,10 +44,10 @@ class ProductTests {
         mainThreadSurrogate.close()
     }
     @Test
-    fun `Given product data are available when I search for cell phone then I should receive a location of recycling center` () = runTest {
+    fun `Given product data are available when I search for cell phones then I should receive a location of recycling center` () = runTest {
         givenProductServiceIsInitialized()
         whenProductDataAreReadAndParsed()
-        thenTheProductCollectionShouldContainCellPhone()
+        thenTheProductCollectionShouldContainCellPhones()
     }
     @Test
     fun `Given product data are available when I search for batteries then I should receive a location of recycling center having lead acid batteries or rechargable batteries` () = runTest {
@@ -56,6 +56,7 @@ class ProductTests {
         thenTheProductCollectionShouldContainBatteriesTypes()
     }
 
+    @Test
     fun `Given product data are available when I search for giberish then I should receive nothing` () = runTest {
         givenProductServiceIsInitialized()
         whenProductDataAreReadAndParsed()
@@ -70,16 +71,16 @@ class ProductTests {
         allProducts = productService.fetchProducts()
     }
 
-    private fun thenTheProductCollectionShouldContainCellPhone() {
+    private fun thenTheProductCollectionShouldContainCellPhones() {
         assertNotNull(allProducts)
         assertTrue(allProducts!!.isNotEmpty())
-        var containsCellPhone = false
+        var containsCellPhones = false
         allProducts!!.forEach {
-            if (it.product.equals("Cell Phone")) {
-                containsCellPhone = true
+            if (it.product.equals("Cell Phones")) {
+                containsCellPhones = true
             }
         }
-        assertTrue(containsCellPhone)
+        assertTrue(containsCellPhones)
     }
 
     private fun thenTheProductCollectionShouldContainBatteriesTypes() {
