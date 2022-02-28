@@ -1,13 +1,22 @@
 package com.findmyrecycling
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import com.findmyrecycling.dto.Product
 import com.findmyrecycling.service.ProductService
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.impl.annotations.MockK
 import junit.framework.Assert.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
-import org.junit.Test
+import kotlinx.coroutines.test.setMain
+import org.junit.*
 import org.junit.rules.TestRule
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class ProductTests {
     @get:Rule
@@ -16,11 +25,29 @@ class ProductTests {
     lateinit var productService : ProductService
     var allProducts : List<Product>? = ArrayList<Product>()
 
+    lateinit var mvm : MainViewModel
+
+    @MockK
+    lateinit var mockProductService : ProductService
+
+    private val mainThreadSurrogate = newSingleThreadContext("Main Thread")
+
+    @Before
+    fun initMocksAndMainThread(){
+        MockKAnnotations.init(this)
+        Dispatchers.setMain(mainThreadSurrogate)
+    }
+
+    @After
+    fun TearDown(){
+        Dispatchers.resetMain()
+        mainThreadSurrogate.close()
+    }
     @Test
-    fun `Given product data are available when I search for cell phone then I should receive a location of recycling center` () = runTest {
+    fun `Given product data are available when I search for cell phones then I should receive a location of recycling center` () = runTest {
         givenProductServiceIsInitialized()
         whenProductDataAreReadAndParsed()
-        thenTheProductCollectionShouldContainCellPhone()
+        thenTheProductCollectionShouldContainCellPhones()
     }
     @Test
     fun `Given product data are available when I search for batteries then I should receive a location of recycling center having lead acid batteries or rechargable batteries` () = runTest {
@@ -44,16 +71,16 @@ class ProductTests {
         allProducts = productService.fetchProducts()
     }
 
-    private fun thenTheProductCollectionShouldContainCellPhone() {
+    private fun thenTheProductCollectionShouldContainCellPhones() {
         assertNotNull(allProducts)
         assertTrue(allProducts!!.isNotEmpty())
-        var containsCellPhone = false
+        var containsCellPhones = false
         allProducts!!.forEach {
             if (it.product.equals("Cell Phones")) {
-                containsCellPhone = true
+                containsCellPhones = true
             }
         }
-        assertTrue(containsCellPhone)
+        assertTrue(containsCellPhones)
     }
 
     private fun thenTheProductCollectionShouldContainBatteriesTypes() {
@@ -80,6 +107,52 @@ class ProductTests {
         assertTrue(containsNothing)
     }
 
+    @Test
+    fun `Given a view model with live data when populated with Cell Phones then results show Cell Phone Recycling Location` () = runTest {
+        givenViewModelIsInitializedWithMockData()
+        whenProductServiceFetchProductsInvoked()
+        thenResultsShouldContainCellPhoneRecycling()
+    }
+
+    private fun givenViewModelIsInitializedWithMockData() {
+        val products = ArrayList<Product>()
+        products.add(Product("Cell Phone", 1, "Cell Phone" ))
+
+        coEvery {(mockProductService.fetchProducts())} returns products
+
+        mvm = MainViewModel(productService = mockProductService)
+
+    }
+
+    private fun whenProductServiceFetchProductsInvoked() {
+        mvm.fetchProducts()
+    }
+
+    private fun thenResultsShouldContainCellPhoneRecycling() {
+
+        var allProducts : List<Product>? = ArrayList<Product>()
+
+        val latch = CountDownLatch(1)
+        //creating a var obersever assigning a static object
+        val observer = object : Observer<List<Product>>{
+            override fun onChanged(recievedProducts: List<Product>?) {
+                allProducts =  recievedProducts
+                latch.countDown()
+                mvm.products.removeObserver(this)
+            }
+        }
+        mvm.products.observeForever(observer)
+        latch.await(10, TimeUnit.SECONDS)
+        assertNotNull(allProducts)
+        assertTrue(allProducts!!.isNotEmpty())
+        var containsCellPhone = false
+        allProducts!!.forEach {
+            if (it.product.equals("Cell Phone")) {
+                containsCellPhone = true
+            }
+        }
+        assertTrue(containsCellPhone)
+    }
 
 
 }
