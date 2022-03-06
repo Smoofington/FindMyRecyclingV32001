@@ -39,7 +39,7 @@ fun ProfileOptions(name: String) {
     var mySavedSearches by remember{ mutableStateOf("")}
 
     Column {
-        OutlinedTextField(
+        TextField(
             value = profile,
             onValueChange = {profile = it},
             label = { Text(stringResource(R.string.profile)) },
@@ -52,7 +52,7 @@ fun ProfileOptions(name: String) {
 
         )
 
-        OutlinedTextField(
+        TextField(
             value = mySavedLocations,
             onValueChange = { mySavedLocations = it },
             label = { Text(stringResource(R.string.mySavedLocations)) },
@@ -64,7 +64,7 @@ fun ProfileOptions(name: String) {
                     shape = RoundedCornerShape(4.dp)),
         )
 
-        OutlinedTextField(
+        TextField(
             value = mySavedSearches,
             onValueChange = { mySavedSearches = it },
             label = { Text(stringResource(R.string.mySavedSearches)) },
