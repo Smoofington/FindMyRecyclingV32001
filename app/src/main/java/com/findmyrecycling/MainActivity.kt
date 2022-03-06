@@ -31,8 +31,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun RecycleSearch(name: String) {
-    var recyclable by remember{ mutableStateOf("")}
-    var location by remember{ mutableStateOf("")}
+    var recyclable by remember{ mutableStateOf("") }
+    var location by remember{ mutableStateOf("") }
 
     Column {
         OutlinedTextField(
