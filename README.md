@@ -47,7 +47,7 @@ Product names are in English
 
 **Given** a feed of product data is available  
 
-**When** I search for “Cell Phone”  
+**When** I search for “Cell Phones”  
 
 **Then** I should receive at least one result with these attributes   
 
@@ -95,13 +95,13 @@ Product names are in English
 
 2.1  
 
-**Given** a user wants to save facility  
+**Given** a user has searches "Cell Phones"
 
-**When** facility is selected and a user signed in  
+**When** search terms are active **and** a user signed in
 
 **Then** I should be able to do the following  
 
-	You can save a facility to favorites
+	Save the searching containing the terms "Cell Phones" to a Firebase Database
 
 2.2  
 
