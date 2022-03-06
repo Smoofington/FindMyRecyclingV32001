@@ -95,13 +95,13 @@ Product names are in English
 
 2.1  
 
-**Given** a user has searches "Cell Phones"
+**Given** a user has searched for "Cell Phones"
 
 **When** search terms are active **and** a user signed in
 
 **Then** I should be able to do the following  
 
-	Save the searching containing the terms "Cell Phones" to a Firebase Database
+	Save the search containing the terms "Cell Phones" to a Firebase Database
 
 2.2  
 
