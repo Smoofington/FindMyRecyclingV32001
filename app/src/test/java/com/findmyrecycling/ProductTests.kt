@@ -39,7 +39,7 @@ class ProductTests {
     }
 
     @After
-    fun TearDown(){
+    fun tearDown(){
         Dispatchers.resetMain()
         mainThreadSurrogate.close()
     }
@@ -76,7 +76,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsCellPhones = false
         allProducts!!.forEach {
-            if (it.product.equals("Cell Phones")) {
+            if (it.product == "Cell Phones") {
                 containsCellPhones = true
             }
         }
@@ -88,7 +88,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsBatteries = false
         allProducts!!.forEach {
-            if (it.product.equals("Rechargable Batteries") || it.product.equals("Lead Acid Batteries")) {
+            if (it.product == "Rechargable Batteries" || it.product.equals("Lead Acid Batteries")) {
                 containsBatteries = true
             }
         }
@@ -100,7 +100,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsNothing = false
         allProducts!!.forEach {
-            if (!it.product.equals("Human Remains")) {
+            if (it.product != "Human Remains") {
                 containsNothing = true
             }
         }
@@ -147,7 +147,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsCellPhone = false
         allProducts!!.forEach {
-            if (it.product.equals("Cell Phone")) {
+            if (it.product == "Cell Phone") {
                 containsCellPhone = true
             }
         }
