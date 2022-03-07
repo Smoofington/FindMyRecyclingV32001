@@ -39,7 +39,7 @@ class ProductTests {
     }
 
     @After
-    fun TearDown(){
+    fun tearDown(){
         Dispatchers.resetMain()
         mainThreadSurrogate.close()
     }
