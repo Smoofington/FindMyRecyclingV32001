@@ -10,7 +10,7 @@ import retrofit2.awaitResponse
 
 class ProductService{
 
-    suspend fun fetchProducts() : List<Product>? {
+    internal suspend fun fetchProducts() : List<Product>? {
         return withContext(Dispatchers.IO) {
             val service = RetrofitClientInstance.retrofitInstance?.create(IProductDAO::class.java)
             val products = async {service?.getAllProducts()}

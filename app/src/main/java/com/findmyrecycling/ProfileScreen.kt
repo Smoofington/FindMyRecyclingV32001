@@ -21,14 +21,14 @@ class ProfileScreen : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background,
                     modifier = Modifier.fillMaxWidth()) {
-                    ProfileOptions("Android")
+                    profileOptions("Android")
                 }
             }
         }
     }
 }
 @Composable
-fun ProfileOptions(name: String) {
+fun profileOptions(name: String) {
     var profile by remember{ mutableStateOf("")}
     var mySavedLocations by remember{ mutableStateOf("")}
     var mySavedSearches by remember{ mutableStateOf("")}
@@ -60,8 +60,8 @@ fun ProfileOptions(name: String) {
 }
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview2() {
+fun defaultPreview2() {
     FindMyRecyclingTheme {
-        ProfileOptions("Android")
+        profileOptions("Android")
     }
 }

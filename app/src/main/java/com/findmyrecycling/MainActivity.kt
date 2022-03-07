@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background,
                 modifier = Modifier.fillMaxWidth()) {
-                    RecycleSearch("Android")
+                    recycleSearch("Android")
                 }
             }
         }
@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun RecycleSearch(name: String) {
+fun recycleSearch(name: String) {
     var recyclable by remember{ mutableStateOf("")}
     var location by remember{ mutableStateOf("")}
 
@@ -55,8 +55,8 @@ fun RecycleSearch(name: String) {
 
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+fun defaultPreview() {
     FindMyRecyclingTheme {
-        RecycleSearch("Android")
+        recycleSearch("Android")
     }
 }
