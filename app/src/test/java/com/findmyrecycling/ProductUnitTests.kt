@@ -46,7 +46,7 @@ class ProductUnitTests {
     @Test
     fun `given a view model with live data when populated with products then results show name of recycling center` () {
         givenViewModelIsInitializedWithMockData()
-        whenProductServiceFetchCountriesInvoked()
+        whenProductServiceFetchProductsInvoked()
         thenResultsShouldContainNameOfRecyclingCenter()
     }
 
@@ -63,7 +63,7 @@ class ProductUnitTests {
         mvm = MainViewModel(productService = mockProductService)
     }
 
-    private fun whenProductServiceFetchCountriesInvoked() {
+    private fun whenProductServiceFetchProductsInvoked() {
         mvm.fetchProducts()
     }
 
