@@ -81,12 +81,12 @@ class ProductUnitTests {
         latch.await(10, TimeUnit.SECONDS)
         Assert.assertNotNull(allProducts)
         Assert.assertTrue(allProducts!!.isNotEmpty())
-        var containsLocation = false
+        var containsNameOfRecyclinCenter = false
         allProducts!!.forEach {
             if (it.product == (("Cell Phones"))) {
-                containsLocation = true
+                containsNameOfRecyclinCenter = true
             }
         }
-        Assert.assertTrue(containsLocation)
+        Assert.assertTrue(containsNameOfRecyclinCenter)
     }
 }
