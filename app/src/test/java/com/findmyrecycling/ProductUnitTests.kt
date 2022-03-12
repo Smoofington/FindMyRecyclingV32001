@@ -83,7 +83,7 @@ class ProductUnitTests {
         Assert.assertTrue(allProducts!!.isNotEmpty())
         var containsLocation = false
         allProducts!!.forEach {
-            if (it.product.equals(("Cell Phones"))) {
+            if (it.product == (("Cell Phones"))) {
                 containsLocation = true
             }
         }
