@@ -133,7 +133,7 @@ class ProductTests {
         var allProducts : List<Product>? = ArrayList<Product>()
 
         val latch = CountDownLatch(1)
-        //creating a var obersever assigning a static object
+        //creating a var observer assigning a static object
         val observer = object : Observer<List<Product>>{
             override fun onChanged(recievedProducts: List<Product>?) {
                 allProducts =  recievedProducts
