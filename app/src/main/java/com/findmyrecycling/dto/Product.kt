@@ -7,4 +7,3 @@ data class Product(var product : String,var id : Int = 0, @SerializedName("name"
         return name
     }
 }
-// hello
