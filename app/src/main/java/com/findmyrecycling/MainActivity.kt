@@ -52,7 +52,6 @@ fun RecycleSearch(name: String) {
                         shape = RoundedCornerShape(4.dp)),
         )
 
-
         OutlinedTextField(
             value = location,
             onValueChange = { location = it },
@@ -64,7 +63,6 @@ fun RecycleSearch(name: String) {
                         color = Color.Black,
                         shape = RoundedCornerShape(4.dp)),
         )
-
     }
 }
 
