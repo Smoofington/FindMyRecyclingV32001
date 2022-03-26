@@ -8,6 +8,6 @@ data class Product(
     @SerializedName("name")var common : String,
     ) {
     override fun toString(): String {
-        return common
+        return name
     }
 }
