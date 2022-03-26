@@ -40,7 +40,7 @@ fun RecycleSearch(name: String) {
     var location by remember{ mutableStateOf("")}
 
     Column {
-        TextField(
+        OutlinedTextField(
             value = recyclable,
             onValueChange = {recyclable = it},
             label = { Text(stringResource(R.string.recyclable)) },
@@ -53,7 +53,7 @@ fun RecycleSearch(name: String) {
         )
 
 
-        TextField(
+        OutlinedTextField(
             value = location,
             onValueChange = { location = it },
             label = { Text(stringResource(R.string.location)) },
