@@ -18,6 +18,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.PopupProperties
+import com.findmyrecycling.dto.Facility
 import com.findmyrecycling.dto.Product
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -48,11 +49,11 @@ class MainActivity : ComponentActivity() {
         dataIn: List<Product>,
         label: String = "",
         take: Int = 3,
-        selectedSpecimen: Specimen = Specimen()
+        selectedFacility: Facility = Facility()
     ) {
 
         val dropDownOptions = remember { mutableStateOf(listOf<Product>()) }
-        val textFieldValue = remember(selectedSpecimen.specimenId) { mutableStateOf(TextFieldValue(selectedSpecimen.plantName)) }
+        val textFieldValue = remember(selectedFacility.id) { mutableStateOf(TextFieldValue(selectedFacility.name)) }
         val dropDownExpanded = remember { mutableStateOf(false) }
 
         fun onDropdownDismissRequest() {
@@ -132,7 +133,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun RecycleSearch(name: String) {
         var recyclable by remember { mutableStateOf("") }
-        var location by remember { mutableStateOf("") }
+        var facility by remember { mutableStateOf("") }
 
         Column {
             OutlinedTextField(
@@ -144,8 +145,8 @@ class MainActivity : ComponentActivity() {
 
 
             OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
+                value = facility,
+                onValueChange = { facility = it },
                 label = { Text(stringResource(R.string.location)) },
                 modifier = Modifier.fillMaxWidth()
             )
