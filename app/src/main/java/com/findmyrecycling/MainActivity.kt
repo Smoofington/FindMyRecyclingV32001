@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun RecycleSearch(name: String) {
+fun RecycleSearch(product: String) {
     var recyclable by remember{ mutableStateOf("") }
     var location by remember{ mutableStateOf("") }
 
