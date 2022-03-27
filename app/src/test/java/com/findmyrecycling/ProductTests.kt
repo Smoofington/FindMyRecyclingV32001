@@ -39,7 +39,7 @@ class ProductTests {
     }
 
     @After
-    fun TearDown(){
+    fun tearDown(){
         Dispatchers.resetMain()
         mainThreadSurrogate.close()
     }
@@ -50,14 +50,14 @@ class ProductTests {
         thenTheProductCollectionShouldContainCellPhones()
     }
     @Test
-    fun `Given product data are available when I search for batteries then I should receive a location of recycling center having lead acid batteries or rechargable batteries` () = runTest {
+    fun `Given product data are available when I search for batteries then I should receive a location of recycling center having lead acid batteries or rechargeable batteries` () = runTest {
         givenProductServiceIsInitialized()
         whenProductDataAreReadAndParsed()
         thenTheProductCollectionShouldContainBatteriesTypes()
     }
 
     @Test
-    fun `Given product data are available when I search for giberish then I should receive nothing` () = runTest {
+    fun `Given product data are available when I search for gibberish then I should receive nothing` () = runTest {
         givenProductServiceIsInitialized()
         whenProductDataAreReadAndParsed()
         thenTheProductCollectionShouldContainNothing()
@@ -76,7 +76,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsCellPhones = false
         allProducts!!.forEach {
-            if (it.product.equals("Cell Phones")) {
+            if (it.product == ("Cell Phones")) {
                 containsCellPhones = true
             }
         }
@@ -88,7 +88,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsBatteries = false
         allProducts!!.forEach {
-            if (it.product.equals("Rechargable Batteries") || it.product.equals("Lead Acid Batteries")) {
+            if (it.product == ("Rechargeable Batteries") || it.product == ("Lead Acid Batteries")) {
                 containsBatteries = true
             }
         }
@@ -100,7 +100,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsNothing = false
         allProducts!!.forEach {
-            if (!it.product.equals("Human Remains")) {
+            if (it.product != ("Human Remains")) {
                 containsNothing = true
             }
         }
@@ -133,7 +133,7 @@ class ProductTests {
         var allProducts : List<Product>? = ArrayList<Product>()
 
         val latch = CountDownLatch(1)
-        //creating a var obersever assigning a static object
+        //creating a var observer assigning a static object
         val observer = object : Observer<List<Product>>{
             override fun onChanged(recievedProducts: List<Product>?) {
                 allProducts =  recievedProducts
@@ -147,7 +147,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsCellPhone = false
         allProducts!!.forEach {
-            if (it.product.equals("Cell Phone")) {
+            if (it.product == ("Cell Phone")) {
                 containsCellPhone = true
             }
         }

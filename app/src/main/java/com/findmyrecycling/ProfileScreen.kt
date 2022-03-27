@@ -33,10 +33,10 @@ class ProfileScreen : ComponentActivity() {
     }
 }
 @Composable
-fun ProfileOptions(product: String) {
-    var profile by remember{ mutableStateOf("")}
-    var mySavedLocations by remember{ mutableStateOf("")}
-    var mySavedSearches by remember{ mutableStateOf("")}
+fun ProfileOptions(name: String) {
+    var profile by remember{ mutableStateOf("") }
+    var mySavedLocations by remember{ mutableStateOf("") }
+    var mySavedSearches by remember{ mutableStateOf("") }
 
     Column {
         TextField(
