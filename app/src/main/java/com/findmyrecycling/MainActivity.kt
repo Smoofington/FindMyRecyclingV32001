@@ -19,6 +19,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +67,8 @@ fun RecycleSearch(product: String) {
                         color = Color.Black,
                         shape = RoundedCornerShape(4.dp)),
         )
+
+
     }
 }
 
@@ -85,5 +90,23 @@ fun DefaultPreview() {
 
 fun signIn() {
     val providers = arrayListOf(AuthUI.IdpConfig.EmailBuilder().build())
+    val signinIntent = AuthUI.getInstance()
+        .createSignInIntentBuilder()
+        .setAvailableProviders(providers)
+        .build()
+
+    signInLauncher.launch(signinIntent)
 }
 
+private val signInLauncher = registerForActivityResult (
+    FirebaseAuthUIActivityResultContract()
+) {
+        res -> this.signInResult(res)
+}
+
+
+private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
+    val response = result.idpResponse
+    if (result.resultCode == ComponentActivity.RESULT_OK) {
+        var user = FirebaseAuth.getInstance().currentUser
+    }
