@@ -53,10 +53,10 @@ class ProductUnitTests {
 
     private fun givenViewModelIsInitializedWithMockData() {
         val products = ArrayList<Product>()
-        products.add(Product("Cell Phones", 1, "Generic Recycling Center1"))
-        val oldComputers = Product("Old Computers", 18, "Generic Recycling Center18")
+        products.add(Product("Cell Phones", 1))
+        val oldComputers = Product("Old Computers", 18)
         products.add(oldComputers)
-        products.add(Product("Old Computers", 18, "Generic Recycling center18"))
+        products.add(Product("Old Computers", 18))
 
         coEvery { mockProductService.fetchProducts() } returns products
 
