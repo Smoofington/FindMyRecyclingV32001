@@ -116,7 +116,7 @@ class ProductTests {
 
     private fun givenViewModelIsInitializedWithMockData() {
         val products = ArrayList<Product>()
-        products.add(Product("Cell Phone", 1, "Cell Phone" ))
+        products.add(Product("Cell Phone", 1 ))
 
         coEvery {(mockProductService.fetchProducts())} returns products
 
