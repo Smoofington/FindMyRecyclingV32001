@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
+import com.firebase.ui.auth.AuthUI
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,4 +73,17 @@ fun DefaultPreview() {
     FindMyRecyclingTheme {
         RecycleSearch("Android")
     }
+
+    Button(
+        onClick = {
+            signIn()
+        }
+    ) {
+        Text(text = "Logon")
+    }
 }
+
+fun signIn() {
+    val providers = arrayListOf(AuthUI.IdpConfig.EmailBuilder().build())
+}
+
