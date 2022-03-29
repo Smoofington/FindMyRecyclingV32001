@@ -10,12 +10,12 @@ import com.findmyrecycling.service.ProductService
 import kotlinx.coroutines.launch
 
 
-class ProductViewModel (var productService: IProductService = ProductService()): ViewModel() {
+class MainViewModel (var productService: IProductService = ProductService()): ViewModel() {
 
     var products : MutableLiveData<List<Product>> = MutableLiveData<List<Product>>()
-    fun fetchProduct(){
+    fun fetchProducts(){
         viewModelScope.launch {
-            products.postValue(productService.fetchProduct())
+            products.postValue(productService.fetchProducts())
         }
     }
 }

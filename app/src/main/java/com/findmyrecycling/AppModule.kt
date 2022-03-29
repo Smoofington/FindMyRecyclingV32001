@@ -8,6 +8,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 
 @JvmField
 val appModule = module {
-    viewModel { ProductViewModel(get()) }
+    viewModel { MainViewModel(get()) }
     single <IProductService>{ ProductService() }
 }

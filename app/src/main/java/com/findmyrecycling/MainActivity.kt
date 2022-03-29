@@ -29,12 +29,12 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: ProductViewModel by viewModel<ProductViewModel>()
+    private val viewModel: MainViewModel by viewModel<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            viewModel.fetchProduct()
+            viewModel.fetchProducts()
             val products by viewModel.products.observeAsState(initial = emptyList())
             FindMyRecyclingTheme {
                 // A surface container using the 'background' color from the theme

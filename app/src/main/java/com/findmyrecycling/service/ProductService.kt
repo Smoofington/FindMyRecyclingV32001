@@ -11,11 +11,11 @@ import retrofit2.awaitResponse
 
 
 interface IProductService {
-    suspend fun fetchProduct() : List<Product>?
+    suspend fun fetchProducts() : List<Product>?
 }
 
 class ProductService : IProductService {
-    override suspend fun fetchProduct() : List <Product>? {
+    override suspend fun fetchProducts() : List <Product>? {
         return withContext(Dispatchers.IO) {
             val service = RetrofitClientInstance.retrofitInstance?.create(IProductDAO::class.java)
             val items = async { service?.getAllProducts()}
