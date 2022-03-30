@@ -60,6 +60,7 @@ fun ProductSpinner (products: List<Product>){
     var productText by remember {mutableStateOf("Product List")}
     var expanded by remember {mutableStateOf(false)}
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+
         Row(Modifier
             .padding(24.dp)
             .clickable {
@@ -88,9 +89,10 @@ fun ProductSpinner (products: List<Product>){
 
 @Composable
 fun ProfileMenu(){
-    Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+        Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
 
-
+    }
 }
 
 @Composable
@@ -136,7 +138,12 @@ fun RecycleSearch(name: String, products: List<Product> = ArrayList<Product>()) 
     //var hamburger_Menu = ImageView(this).apply{
     //    setImageResource(R.drawable.ic_hamburger_menu)
     //}
+    Row {
+        Arrangement.Center
+        ProfileMenu()
+    }
     Column {
+
         ProductSpinner(products = products)
         //TextFieldWithDropdownUsage(dataIn = pr)
 
