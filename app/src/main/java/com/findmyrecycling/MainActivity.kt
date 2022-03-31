@@ -1,6 +1,7 @@
 package com.findmyrecycling
 
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -88,6 +89,15 @@ fun DefaultPreview() {
             Text(text = "Logon")
         }
     }
+}
+
+interface FirebaseAuthManager {
+
+    fun buildLoginIntent(): Intent
+    fun buildLoginActivityResult(): FirebaseAuthUIActivityResultContract =
+        FirebaseAuthUIActivityResultContract()
+
+    fun onLoginResult(result: FirebaseAuthUIAuthenticationResult)
 }
 
 fun signIn() {
