@@ -23,7 +23,7 @@ class ProductTests {
     var rule: TestRule = InstantTaskExecutorRule()
 
     lateinit var productService : ProductService
-    var allProducts : List<Product>? = ArrayList<Product>()
+    private var allProducts : List<Product>? = ArrayList<Product>()
 
     lateinit var mvm : MainViewModel
 
@@ -57,7 +57,7 @@ class ProductTests {
     }
 
     @Test
-    fun `Given product data are available when I search for giberish then I should receive nothing` () = runTest {
+    fun `Given product data are available when I search for gibberish then I should receive nothing` () = runTest {
         givenProductServiceIsInitialized()
         whenProductDataAreReadAndParsed()
         thenTheProductCollectionShouldContainNothing()
@@ -88,7 +88,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsBatteries = false
         allProducts!!.forEach {
-            if (it.product == "Rechargable Batteries" || it.product.equals("Lead Acid Batteries")) {
+            if (it.product == "Rechargeable Batteries" || it.product.equals("Lead Acid Batteries")) {
                 containsBatteries = true
             }
         }
@@ -133,7 +133,6 @@ class ProductTests {
         var allProducts : List<Product>? = ArrayList<Product>()
 
         val latch = CountDownLatch(1)
-        //creating a var obersever assigning a static object
         val observer = object : Observer<List<Product>>{
             override fun onChanged(recievedProducts: List<Product>?) {
                 allProducts =  recievedProducts
