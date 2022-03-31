@@ -110,3 +110,4 @@ private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
     if (result.resultCode == ComponentActivity.RESULT_OK) {
         var user = FirebaseAuth.getInstance().currentUser
     }
+}
