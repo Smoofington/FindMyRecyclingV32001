@@ -5,13 +5,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -31,7 +29,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background,
                 modifier = Modifier.fillMaxWidth()) {
-                    RecycleSearch("Android")
+                    DefaultPreview()
                 }
             }
         }
@@ -51,9 +49,11 @@ fun RecycleSearch(product: String) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                .border(width = 1.dp,
-                        color = Color.Black,
-                        shape = RoundedCornerShape(4.dp)),
+                .border(
+                    width = 1.dp,
+                    color = Color.Black,
+                    shape = RoundedCornerShape(4.dp)
+                ),
         )
 
         OutlinedTextField(
@@ -63,9 +63,11 @@ fun RecycleSearch(product: String) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                .border(width = 1.dp,
-                        color = Color.Black,
-                        shape = RoundedCornerShape(4.dp)),
+                .border(
+                    width = 1.dp,
+                    color = Color.Black,
+                    shape = RoundedCornerShape(4.dp)
+                ),
         )
 
 
@@ -75,16 +77,16 @@ fun RecycleSearch(product: String) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    FindMyRecyclingTheme {
+    Column (Modifier.fillMaxSize().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(20.dp)) {
         RecycleSearch("Android")
-    }
+        Button(
 
-    Button(
-        onClick = {
-            signIn()
+            onClick = {
+                signIn()
+            }
+        ) {
+            Text(text = "Logon")
         }
-    ) {
-        Text(text = "Logon")
     }
 }
 
