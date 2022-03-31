@@ -95,14 +95,14 @@ fun signIn() {
         .setAvailableProviders(providers)
         .build()
 
-    signInLauncher.launch(signinIntent)
+//    signInLauncher.launch(signinIntent)
 }
 
-private val signInLauncher = registerForActivityResult (
-    FirebaseAuthUIActivityResultContract()
-) {
-        res -> this.signInResult(res)
-}
+//private val signInLauncher = registerForActivityResult (
+//    FirebaseAuthUIActivityResultContract()
+//) {
+//        res -> this.signInResult(res)
+//}
 
 
 private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
