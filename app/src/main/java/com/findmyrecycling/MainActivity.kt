@@ -60,172 +60,173 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 
-@Composable
-fun ProductSpinner (products: List<Product>){
-    var productText by remember {mutableStateOf("Product List")}
-    var expanded by remember {mutableStateOf(false)}
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+    @Composable
+    fun ProductSpinner (products: List<Product>){
+        var productText by remember {mutableStateOf("Product List")}
+        var expanded by remember {mutableStateOf(false)}
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
 
-        Row(Modifier
-            .padding(24.dp)
-            .clickable {
-                expanded = !expanded
-            }
-            .padding(8.dp),
-            horizontalArrangement= Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = productText,fontSize =18.sp, modifier = Modifier.padding(end =8.dp))
-            Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
-            DropdownMenu(expanded = expanded, onDismissRequest = {expanded = false }) {
-                products.forEach{
-                    product -> DropdownMenuItem(onClick = {
-                      expanded = false
-                    productText = product.toString()
-                    selectedProduct = product
-                }) {
-                        Text(text = product.toString())
+            Row(Modifier
+                .padding(24.dp)
+                .clickable {
+                    expanded = !expanded
                 }
+                .padding(8.dp),
+                horizontalArrangement= Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = productText,fontSize =18.sp, modifier = Modifier.padding(end =8.dp))
+                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
+                DropdownMenu(expanded = expanded, onDismissRequest = {expanded = false }) {
+                    products.forEach{
+                        product -> DropdownMenuItem(onClick = {
+                          expanded = false
+                        productText = product.toString()
+                        selectedProduct = product
+                    }) {
+                            Text(text = product.toString())
+                    }
+                    }
                 }
             }
         }
     }
-}
 
-@Composable
-fun ProfileMenu(){
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-        Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
+    @Composable
+    fun ProfileMenu(){
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+            Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
 
-    }
-}
-
-@Composable
-fun TextFieldWithDropdownUsage(data: List<Product>){
-    val dropDownOptions = remember{ mutableStateOf(listOf<Product>())}
-    val textFieldValue = remember {mutableStateOf(TextFieldValue())}
-    val dropDownExpanded = remember {mutableStateOf(false)}
-
-    fun onDropdownDismissRequest(){
-        dropDownExpanded.value = false
+        }
     }
 
-    fun onValueChanged(value: TextFieldValue){
-        //strSelectedData = value.text
-        dropDownExpanded.value = true
-        textFieldValue.value = value
-       // dropDownOptions.value =ProductIn.filter { it.toString().startsWith(value.text) && it.toString()}
-    }
-}
+    @Composable
+    fun TextFieldWithDropdownUsage(data: List<Product>){
+        val dropDownOptions = remember{ mutableStateOf(listOf<Product>())}
+        val textFieldValue = remember {mutableStateOf(TextFieldValue())}
+        val dropDownExpanded = remember {mutableStateOf(false)}
 
-@Composable
-fun TextFieldWithDropdown(
-    modifier: Modifier = Modifier,
-    value: TextFieldValue,
-    setValue: (TextFieldValue) -> Unit,
-    onDismissRequest: () -> Unit,
-    dropDownExpanded: Boolean,
-    list: List<Product>,
-    label: String = ""
-){}
+        fun onDropdownDismissRequest(){
+            dropDownExpanded.value = false
+        }
 
-
-
-
-@Composable
-fun RecycleSearch(name: String, products: List<Product> = ArrayList<Product>()) {
-    var recyclable by remember{ mutableStateOf("")}
-    var location by remember{ mutableStateOf("")}
-    val context = LocalContext.current
-   // val i = ImageView(this).apply {
-   //     setImageResource(R.drawable.ic_hamburger_menu.)
-  //  }
-    //var hamburger_Menu = ImageView(this).apply{
-    //    setImageResource(R.drawable.ic_hamburger_menu)
-    //}
-    Row {
-        Arrangement.Center
-        ProfileMenu()
+        fun onValueChanged(value: TextFieldValue){
+            //strSelectedData = value.text
+            dropDownExpanded.value = true
+            textFieldValue.value = value
+           // dropDownOptions.value =ProductIn.filter { it.toString().startsWith(value.text) && it.toString()}
+        }
     }
 
-    Column {
+    @Composable
+    fun TextFieldWithDropdown(
+        modifier: Modifier = Modifier,
+        value: TextFieldValue,
+        setValue: (TextFieldValue) -> Unit,
+        onDismissRequest: () -> Unit,
+        dropDownExpanded: Boolean,
+        list: List<Product>,
+        label: String = ""
+    ){}
 
-        ProductSpinner(products = products)
-        //TextFieldWithDropdownUsage(dataIn = pr)
 
-        OutlinedTextField(
-            value = recyclable,
-            onValueChange = {recyclable = it},
-            label = { Text(stringResource(R.string.recyclable)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                .border(width = 1.dp,
-                        color = Color.Black,
-                        shape = RoundedCornerShape(4.dp)),
-        )
 
-        OutlinedTextField(
-            value = location,
-            onValueChange = { location = it },
-            label = { Text(stringResource(R.string.location)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                .border(width = 1.dp,
-                        color = Color.Black,
-                        shape = RoundedCornerShape(4.dp)),
-        )
-        Button (
+
+    @Composable
+    fun RecycleSearch(name: String, products: List<Product> = ArrayList<Product>()) {
+        var recyclable by remember{ mutableStateOf("")}
+        var location by remember{ mutableStateOf("")}
+        val context = LocalContext.current
+       // val i = ImageView(this).apply {
+       //     setImageResource(R.drawable.ic_hamburger_menu.)
+      //  }
+        //var hamburger_Menu = ImageView(this).apply{
+        //    setImageResource(R.drawable.ic_hamburger_menu)
+        //}
+        Row {
+            Arrangement.Center
+            ProfileMenu()
+        }
+
+        Column {
+
+            ProductSpinner(products = products)
+            //TextFieldWithDropdownUsage(dataIn = pr)
+
+            OutlinedTextField(
+                value = recyclable,
+                onValueChange = {recyclable = it},
+                label = { Text(stringResource(R.string.recyclable)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
+                    .border(width = 1.dp,
+                            color = Color.Black,
+                            shape = RoundedCornerShape(4.dp)),
+            )
+
+            OutlinedTextField(
+                value = location,
+                onValueChange = { location = it },
+                label = { Text(stringResource(R.string.location)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
+                    .border(width = 1.dp,
+                            color = Color.Black,
+                            shape = RoundedCornerShape(4.dp)),
+            )
+            Button (
+                onClick = {
+                   // Toast.makeText(context, "$name")
+                }
+                    )
+            {
+                Text(text = "Save")
+            }
+
+
+        }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun DefaultPreview() {
+        FindMyRecyclingTheme {
+            RecycleSearch("Android")
+        }
+
+        Button(
             onClick = {
-               // Toast.makeText(context, "$name")
+                signIn()
             }
-                )
-        {
-            Text(text = "Save")
+        ) {
+            Text(text = "Logon")
         }
-
-
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    FindMyRecyclingTheme {
-        RecycleSearch("Android")
     }
 
-    Button(
-        onClick = {
-            signIn()
-        }
+    fun signIn() {
+        val providers = arrayListOf(AuthUI.IdpConfig.EmailBuilder().build())
+        val signinIntent = AuthUI.getInstance()
+            .createSignInIntentBuilder()
+            .setAvailableProviders(providers)
+            .build()
+
+        signInLauncher.launch(signinIntent)
+    }
+
+    private val signInLauncher = registerForActivityResult (
+        FirebaseAuthUIActivityResultContract()
     ) {
-        Text(text = "Logon")
+            res -> this.signInResult(res)
+    }
+
+
+    private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
+        val response = result.idpResponse
+        if (result.resultCode == ComponentActivity.RESULT_OK) {
+            var user = FirebaseAuth.getInstance().currentUser
+        }
     }
 }
-
-fun signIn() {
-    val providers = arrayListOf(AuthUI.IdpConfig.EmailBuilder().build())
-    val signinIntent = AuthUI.getInstance()
-        .createSignInIntentBuilder()
-        .setAvailableProviders(providers)
-        .build()
-
-    signInLauncher.launch(signinIntent)
-}
-
-private val signInLauncher = registerForActivityResult (
-    FirebaseAuthUIActivityResultContract()
-) {
-        res -> this.signInResult(res)
-}
-
-
-private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
-    val response = result.idpResponse
-    if (result.resultCode == ComponentActivity.RESULT_OK) {
-        var user = FirebaseAuth.getInstance().currentUser
-    }
