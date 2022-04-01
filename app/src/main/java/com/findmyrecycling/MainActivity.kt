@@ -1,6 +1,5 @@
 package com.findmyrecycling
 
-
 import android.graphics.drawable.Drawable
 import android.media.Image
 import android.os.Bundle
@@ -10,6 +9,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -18,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,6 +34,11 @@ import com.google.common.collect.Iterators.filter
 import com.google.common.collect.Multisets.filter
 import com.google.common.collect.Sets.filter
 import java.util.Locale.filter
+import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.google.firebase.auth.FirebaseAuth
 
 var selectedProduct: Product? = null
 
@@ -142,6 +149,7 @@ fun RecycleSearch(name: String, products: List<Product> = ArrayList<Product>()) 
         Arrangement.Center
         ProfileMenu()
     }
+
     Column {
 
         ProductSpinner(products = products)
@@ -151,15 +159,24 @@ fun RecycleSearch(name: String, products: List<Product> = ArrayList<Product>()) 
             value = recyclable,
             onValueChange = {recyclable = it},
             label = { Text(stringResource(R.string.recyclable)) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
+                .border(width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(4.dp)),
         )
-
 
         OutlinedTextField(
             value = location,
             onValueChange = { location = it },
             label = { Text(stringResource(R.string.location)) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
+                .border(width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(4.dp)),
         )
         Button (
             onClick = {
@@ -170,6 +187,7 @@ fun RecycleSearch(name: String, products: List<Product> = ArrayList<Product>()) 
             Text(text = "Save")
         }
 
+
     }
 }
 
@@ -179,4 +197,35 @@ fun DefaultPreview() {
     FindMyRecyclingTheme {
         RecycleSearch("Android")
     }
+
+    Button(
+        onClick = {
+            signIn()
+        }
+    ) {
+        Text(text = "Logon")
+    }
 }
+
+fun signIn() {
+    val providers = arrayListOf(AuthUI.IdpConfig.EmailBuilder().build())
+    val signinIntent = AuthUI.getInstance()
+        .createSignInIntentBuilder()
+        .setAvailableProviders(providers)
+        .build()
+
+    signInLauncher.launch(signinIntent)
+}
+
+private val signInLauncher = registerForActivityResult (
+    FirebaseAuthUIActivityResultContract()
+) {
+        res -> this.signInResult(res)
+}
+
+
+private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
+    val response = result.idpResponse
+    if (result.resultCode == ComponentActivity.RESULT_OK) {
+        var user = FirebaseAuth.getInstance().currentUser
+    }
