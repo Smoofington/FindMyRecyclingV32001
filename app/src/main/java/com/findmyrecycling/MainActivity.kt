@@ -7,11 +7,13 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
@@ -22,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,9 +58,52 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background,
                 modifier = Modifier.fillMaxWidth()) {
-                    RecycleSearch("Android", products)
+                    RecycleSearch("", products)
                 }
             }
+        }
+    }
+
+    @Composable
+    fun RecycleSearch(name: String, products: List<Product> = ArrayList<Product>()) {
+        var recyclable by remember{ mutableStateOf("")}
+        var location by remember{ mutableStateOf("")}
+        val context = LocalContext.current
+
+        Column {
+            ProfileMenu()
+
+            ProductSpinner(products = products)
+            //TextFieldWithDropdownUsage(dataIn = pr)
+
+            OutlinedTextField(
+                value = recyclable,
+                onValueChange = {recyclable = it},
+                label = { Text(stringResource(R.string.recyclable)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
+            )
+
+            OutlinedTextField(
+                value = location,
+                onValueChange = { location = it },
+                label = { Text(stringResource(R.string.location)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
+            )
+            Button (
+                onClick = {
+                    // Toast.makeText(context, "$name")
+                },
+                modifier = Modifier.padding(5.dp)
+            )
+            {
+                Text(text = "Save")
+            }
+
+
         }
     }
 
@@ -81,7 +127,7 @@ class MainActivity : ComponentActivity() {
                 DropdownMenu(expanded = expanded, onDismissRequest = {expanded = false }) {
                     products.forEach{
                         product -> DropdownMenuItem(onClick = {
-                          expanded = false
+                        expanded = false
                         productText = product.toString()
                         selectedProduct = product
                     }) {
@@ -95,9 +141,28 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun ProfileMenu(){
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-            Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
+        val context = LocalContext.current
+        Box(
+            modifier = Modifier
+                .background(color = Color.LightGray)
+                .fillMaxWidth()
+                .padding(5.dp),
+                contentAlignment = Alignment.CenterStart)
 
+        {
+            Row()
+            {
+                IconButton(
+                    onClick = { Toast.makeText(context, "Menu Clicked", Toast.LENGTH_LONG).show() }
+                ) {
+                    Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
+                }
+
+                Text("Find My Recycling",
+                    textAlign = TextAlign.Center,
+                    fontSize = 23.sp,
+                    modifier = Modifier.padding(top = 5.dp))
+            }
         }
     }
 
@@ -133,62 +198,7 @@ class MainActivity : ComponentActivity() {
 
 
 
-    @Composable
-    fun RecycleSearch(name: String, products: List<Product> = ArrayList<Product>()) {
-        var recyclable by remember{ mutableStateOf("")}
-        var location by remember{ mutableStateOf("")}
-        val context = LocalContext.current
-       // val i = ImageView(this).apply {
-       //     setImageResource(R.drawable.ic_hamburger_menu.)
-      //  }
-        //var hamburger_Menu = ImageView(this).apply{
-        //    setImageResource(R.drawable.ic_hamburger_menu)
-        //}
-        Row {
-            Arrangement.Center
-            ProfileMenu()
-        }
 
-        Column {
-
-            ProductSpinner(products = products)
-            //TextFieldWithDropdownUsage(dataIn = pr)
-
-            OutlinedTextField(
-                value = recyclable,
-                onValueChange = {recyclable = it},
-                label = { Text(stringResource(R.string.recyclable)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                    .border(width = 1.dp,
-                            color = Color.Black,
-                            shape = RoundedCornerShape(4.dp)),
-            )
-
-            OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
-                label = { Text(stringResource(R.string.location)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                    .border(width = 1.dp,
-                            color = Color.Black,
-                            shape = RoundedCornerShape(4.dp)),
-            )
-            Button (
-                onClick = {
-                   // Toast.makeText(context, "$name")
-                }
-                    )
-            {
-                Text(text = "Save")
-            }
-
-
-        }
-    }
 
     @Preview(showBackground = true)
     @Composable
@@ -197,13 +207,7 @@ class MainActivity : ComponentActivity() {
             RecycleSearch("Android")
         }
 
-        Button(
-            onClick = {
-                signIn()
-            }
-        ) {
-            Text(text = "Logon")
-        }
+
     }
 
     fun signIn() {
