@@ -25,6 +25,7 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.livedata.observeAsState
 import com.findmyrecycling.dto.Product
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -41,6 +42,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            viewModel.fetchProducts()
+            val products by viewModel.products.observeAsState(initial = emptyList())
             FindMyRecyclingTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background,
@@ -63,9 +66,11 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                    .border(width = 1.dp,
+                    .border(
+                        width = 1.dp,
                         color = Color.Black,
-                        shape = RoundedCornerShape(4.dp)),
+                        shape = RoundedCornerShape(4.dp)
+                    ),
             )
 
             OutlinedTextField(
@@ -75,9 +80,11 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                    .border(width = 1.dp,
+                    .border(
+                        width = 1.dp,
                         color = Color.Black,
-                        shape = RoundedCornerShape(4.dp)),
+                        shape = RoundedCornerShape(4.dp)
+                    ),
             )
             Button(
                 onClick = {
