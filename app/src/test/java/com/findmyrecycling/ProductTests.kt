@@ -22,8 +22,8 @@ class ProductTests {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    lateinit var productService : ProductService
-    var allProducts : List<Product>? = ArrayList<Product>()
+    private lateinit var productService : ProductService
+    private var allProducts : List<Product>? = ArrayList()
 
     lateinit var mvm : MainViewModel
 
@@ -130,7 +130,7 @@ class ProductTests {
 
     private fun thenResultsShouldContainCellPhoneRecycling() {
 
-        var allProducts : List<Product>? = ArrayList<Product>()
+        var allProducts : List<Product>? = ArrayList()
 
         val latch = CountDownLatch(1)
         //creating a var observer assigning a static object

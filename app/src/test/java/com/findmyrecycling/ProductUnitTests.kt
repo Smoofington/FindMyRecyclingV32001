@@ -68,7 +68,7 @@ class ProductUnitTests {
     }
 
     private fun thenResultsShouldContainNameOfRecyclingCenter() {
-        var allProducts : List<Product>? = ArrayList<Product>()
+        var allProducts : List<Product>? = ArrayList()
         val latch = CountDownLatch(1)
         val observer = object : Observer<List<Product>> {
             override fun onChanged(receivedProducts: List<Product>?) {
@@ -81,12 +81,12 @@ class ProductUnitTests {
         latch.await(10, TimeUnit.SECONDS)
         Assert.assertNotNull(allProducts)
         Assert.assertTrue(allProducts!!.isNotEmpty())
-        var containsNameOfRecyclinCenter = false
+        var containsNameOfRecyclingCenter = false
         allProducts!!.forEach {
             if (it.product == (("Cell Phones"))) {
-                containsNameOfRecyclinCenter = true
+                containsNameOfRecyclingCenter = true
             }
         }
-        Assert.assertTrue(containsNameOfRecyclinCenter)
+        Assert.assertTrue(containsNameOfRecyclingCenter)
     }
 }
