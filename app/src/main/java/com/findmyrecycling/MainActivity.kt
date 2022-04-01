@@ -3,6 +3,7 @@ package com.findmyrecycling
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
@@ -22,7 +23,9 @@ import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.activity.result.contract.ActivityResultContracts
+import com.findmyrecycling.dto.Product
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
@@ -33,6 +36,7 @@ class MainActivity : ComponentActivity() {
 
 
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+    private val viewModel: MainViewModel by viewModel<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,13 +52,13 @@ class MainActivity : ComponentActivity() {
     }
     @Composable
     fun RecycleSearch(product: String) {
-        var recyclable by remember{ mutableStateOf("") }
+        var inRecyclable by remember{ mutableStateOf("") }
         var location by remember{ mutableStateOf("") }
 
         Column {
             OutlinedTextField(
-                value = recyclable,
-                onValueChange = {recyclable = it},
+                value = inRecyclable,
+                onValueChange = {inRecyclable = it},
                 label = { Text(stringResource(R.string.recyclable)) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -75,6 +79,16 @@ class MainActivity : ComponentActivity() {
                         color = Color.Black,
                         shape = RoundedCornerShape(4.dp)),
             )
+            Button(
+                onClick = {
+                    var product = Product().apply {
+                         this.product = inRecyclable
+                    }
+                    viewModel.save(product)
+                }
+            ) {
+                Text(text = "Save")
+            }
             Button(
                 onClick = {
                     signIn()
