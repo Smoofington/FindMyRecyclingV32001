@@ -2,6 +2,7 @@ package com.findmyrecycling
 
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
@@ -21,9 +22,18 @@ import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+
+private var user: FirebaseUser? = null
+
 
 class MainActivity : ComponentActivity() {
+
+
+    private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -36,77 +46,88 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
+    @Composable
+    fun RecycleSearch(product: String) {
+        var recyclable by remember{ mutableStateOf("") }
+        var location by remember{ mutableStateOf("") }
 
-@Composable
-fun RecycleSearch(product: String) {
-    var recyclable by remember{ mutableStateOf("") }
-    var location by remember{ mutableStateOf("") }
-
-    Column {
-        OutlinedTextField(
-            value = recyclable,
-            onValueChange = {recyclable = it},
-            label = { Text(stringResource(R.string.recyclable)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                .border(width = 1.dp,
+        Column {
+            OutlinedTextField(
+                value = recyclable,
+                onValueChange = {recyclable = it},
+                label = { Text(stringResource(R.string.recyclable)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
+                    .border(width = 1.dp,
                         color = Color.Black,
                         shape = RoundedCornerShape(4.dp)),
-        )
+            )
 
-        OutlinedTextField(
-            value = location,
-            onValueChange = { location = it },
-            label = { Text(stringResource(R.string.location)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                .border(width = 1.dp,
+            OutlinedTextField(
+                value = location,
+                onValueChange = { location = it },
+                label = { Text(stringResource(R.string.location)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
+                    .border(width = 1.dp,
                         color = Color.Black,
                         shape = RoundedCornerShape(4.dp)),
-        )
+            )
+            Button(
+                onClick = {
+                    signIn()
+                }
+            ) {
+                Text(text = "Logon")
+            }
 
-
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    FindMyRecyclingTheme {
-        RecycleSearch("Android")
-    }
-
-    Button(
-        onClick = {
-            signIn()
         }
-    ) {
-        Text(text = "Logon")
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun DefaultPreview() {
+        FindMyRecyclingTheme {
+            RecycleSearch("Android")
+        }
+
+        Button(
+            onClick = {
+                signIn()
+            }
+        ) {
+            Text(text = "Logon")
+        }
+    }
+
+    fun signIn() {
+        val providers = arrayListOf(AuthUI.IdpConfig.EmailBuilder().build())
+
+        val signinIntent = AuthUI.getInstance()
+            .createSignInIntentBuilder()
+            .setAvailableProviders(providers)
+            .build()
+
+        signInLauncher.launch(signinIntent)
+
+    }
+
+    private val signInLauncher = registerForActivityResult(
+        FirebaseAuthUIActivityResultContract()
+    ){
+            res -> this.signInResult(res)
+    }
+
+
+    private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
+        val response = result.idpResponse
+        if (result.resultCode == ComponentActivity.RESULT_OK) {
+            user = FirebaseAuth.getInstance().currentUser
+        }else {
+            Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
+        }
     }
 }
 
-fun signIn() {
-    val providers = arrayListOf(AuthUI.IdpConfig.EmailBuilder().build())
-    val signinIntent = AuthUI.getInstance()
-        .createSignInIntentBuilder()
-        .setAvailableProviders(providers)
-        .build()
-
-    signInLauncher.launch(signinIntent)
-}
-
-private val signInLauncher = registerForActivityResult (
-    FirebaseAuthUIActivityResultContract()
-) {
-        res -> this.signInResult(res)
-}
-
-
-private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
-    val response = result.idpResponse
-    if (result.resultCode == ComponentActivity.RESULT_OK) {
-        var user = FirebaseAuth.getInstance().currentUser
-    }
