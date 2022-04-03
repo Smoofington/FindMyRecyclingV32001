@@ -13,9 +13,8 @@ class ProductService{
     suspend fun fetchProducts() : List<Product>? {
         return withContext(Dispatchers.IO) {
             val service = RetrofitClientInstance.retrofitInstance?.create(IProductDAO::class.java)
-            val products = async {service?.getAllProducts()}
-            var result = products.await()?.awaitResponse()?.body()
-            return@withContext result
+            val products = async { service?.getAllProducts() }
+            return@withContext products.await()?.awaitResponse()?.body()
         }
     }
 }

@@ -1,10 +1,6 @@
 package com.findmyrecycling
 
-import android.graphics.drawable.Drawable
-import android.media.Image
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -25,15 +21,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.res.ResourcesCompat
 import com.findmyrecycling.dto.Product
-import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
-import com.google.common.collect.Collections2.filter
-import com.google.common.collect.Iterables.filter
-import com.google.common.collect.Iterators.filter
-import com.google.common.collect.Multisets.filter
-import com.google.common.collect.Sets.filter
-import java.util.Locale.filter
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -206,7 +194,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun signIn() {
+    private fun signIn() {
         val providers = arrayListOf(AuthUI.IdpConfig.EmailBuilder().build())
         val signinIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
