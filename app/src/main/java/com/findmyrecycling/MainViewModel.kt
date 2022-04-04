@@ -14,8 +14,7 @@ class MainViewModel(var productService : ProductService = ProductService()) : Vi
 
     fun fetchProducts() {
         viewModelScope.launch {
-            var innerProducts = productService.fetchProducts()
-            products.postValue(innerProducts)
+            products.postValue(productService.fetchProducts())
         }
     }
 
