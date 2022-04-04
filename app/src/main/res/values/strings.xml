@@ -5,4 +5,7 @@
     <string name="profile">Profile</string>
     <string name="mySavedLocations">My Saved Locations</string>
     <string name="mySavedSearches">My Saved Searches</string>
+    <string name="Android">Android</string>
+    <string name="Logon">Logon</string>
+    <string name="Save">Save</string>
 </resources>

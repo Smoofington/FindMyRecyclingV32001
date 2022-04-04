@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background,
                 modifier = Modifier.fillMaxWidth()) {
-                    RecycleSearch("Android", products)
+                    RecycleSearch(getString(R.string.Android), products)
                 }
             }
         }
@@ -171,7 +171,7 @@ class MainActivity : ComponentActivity() {
                 }
                     )
             {
-                Text(text = "Save")
+                Text(text = stringResource(R.string.Save))
             }
 
 
@@ -182,7 +182,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun DefaultPreview() {
         FindMyRecyclingTheme {
-            RecycleSearch("Android")
+            RecycleSearch(getString(R.string.Android))
         }
 
         Button(
@@ -190,7 +190,7 @@ class MainActivity : ComponentActivity() {
                 signIn()
             }
         ) {
-            Text(text = "Logon")
+            Text(text = stringResource(R.string.Logon))
         }
     }
 
