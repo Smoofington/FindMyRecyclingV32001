@@ -48,9 +48,9 @@ class MainActivity : ComponentActivity() {
         setContent {
            // MainViewModel.FetchProducts()
             val products = ArrayList<Product>()
-            products.add(Product(product = "Tin Can", id = 0))
-            products.add(Product(product = "Car Door", id = 1))
-            products.add(Product(product = "Glass", id = 2))
+            products.add(Product(product = "Tin Can", productId = 0))
+            products.add(Product(product = "Car Door", productId = 1))
+            products.add(Product(product = "Glass", productId = 2))
             FindMyRecyclingTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background,
