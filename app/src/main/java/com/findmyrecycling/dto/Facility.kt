@@ -1,6 +1,6 @@
 package com.findmyrecycling.dto
 
-class Facility (
+data class Facility (
     var facilityId: int = 0,
     var productId: int = 0,
     var facilityName: String = "",
