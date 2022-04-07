@@ -5,4 +5,8 @@
     <string name="profile">Profile</string>
     <string name="mySavedLocations">My Saved Locations</string>
     <string name="mySavedSearches">My Saved Searches</string>
+    <string name="facilityName">Facility Name</string>
+    <string name="facilityLocation">Facility Location</string>
+    <string name="facilityDetails">Facility Details</string>
+    <string name="recyclableProduct">Recyclable Product</string>
 </resources>

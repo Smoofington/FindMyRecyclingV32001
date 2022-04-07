@@ -3,14 +3,12 @@ package com.findmyrecycling
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -32,49 +30,69 @@ class ProfileScreen : ComponentActivity() {
         }
     }
 }
+
 @Composable
-fun ProfileOptions(product: String) {
-    var profile by remember{ mutableStateOf("") }
-    var mySavedLocations by remember{ mutableStateOf("") }
-    var mySavedSearches by remember{ mutableStateOf("") }
+fun MainMenu(){
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+        Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
+
+    }
+}
+
+@Composable
+fun ProfileOptions(name: String) {
+    var facilityName by remember{ mutableStateOf("")}
+    var facilityLocation by remember{ mutableStateOf("")}
+    var facilityDetails by remember{ mutableStateOf("")}
+    var recyclableProduct by remember{ mutableStateOf("")}
 
     Column {
-        TextField(
-            value = profile,
-            onValueChange = {profile = it},
-            label = { Text(stringResource(R.string.profile)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                .border(width = 1.dp,
-                    color = Color.Black,
-                    shape = RoundedCornerShape(4.dp)),
+        OutlinedTextField(
+            value = facilityName,
+            onValueChange = {facilityName = it},
+            label = { Text(stringResource(R.string.facilityName)) },
+            modifier = Modifier.fillMaxWidth()
+        )
 
         )
 
-        TextField(
-            value = mySavedLocations,
-            onValueChange = { mySavedLocations = it },
-            label = { Text(stringResource(R.string.mySavedLocations)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                .border(width = 1.dp,
-                    color = Color.Black,
-                    shape = RoundedCornerShape(4.dp)),
+        OutlinedTextField(
+            value = facilityLocation,
+            onValueChange = { facilityLocation = it },
+            label = { Text(stringResource(R.string.facilityLocation)) },
+            modifier = Modifier.fillMaxWidth()
         )
 
-        TextField(
-            value = mySavedSearches,
-            onValueChange = { mySavedSearches = it },
-            label = { Text(stringResource(R.string.mySavedSearches)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                .border(width = 1.dp,
-                    color = Color.Black,
-                    shape = RoundedCornerShape(4.dp)),
+        OutlinedTextField(
+            value = facilityDetails,
+            onValueChange = { facilityDetails = it },
+            label = { Text(stringResource(R.string.facilityDetails)) },
+            modifier = Modifier.fillMaxWidth()
         )
+        OutlinedTextField(
+            value = recyclableProduct,
+            onValueChange = { recyclableProduct = it },
+            label = { Text(stringResource(R.string.recyclableProduct)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Row {
+            Button(
+                onClick = {
+                    // Toast.makeText(context, "$name")
+                }
+            )
+            {
+                Text(text = "Save")
+            }
+            Button(
+                onClick = {
+                    // Toast.makeText(context, "$name")
+                }
+            )
+            {
+                Text(text = "Photo")
+            }
+        }
 
     }
 }
