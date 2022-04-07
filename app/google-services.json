@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "232675807517",
+    "project_id": "find-my-recycling",
+    "storage_bucket": "find-my-recycling.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:232675807517:android:3a0ae0969c7031e4d011f4",
+        "android_client_info": {
+          "package_name": "com.findmyrecycling"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "232675807517-erd31nvne7fj019icocdgpb4881pukis.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDvvtB1Vf96E32xB187iCK95W6ceu2Zrc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "232675807517-erd31nvne7fj019icocdgpb4881pukis.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
