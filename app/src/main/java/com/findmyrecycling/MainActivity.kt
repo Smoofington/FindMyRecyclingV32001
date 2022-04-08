@@ -1,12 +1,19 @@
 package com.findmyrecycling
 
+import android.Manifest
+import android.content.ContentValues
+import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.media.Image
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.border
@@ -25,8 +32,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
+import com.findmyrecycling.dto.Photo
 import com.findmyrecycling.dto.Product
+import com.findmyrecycling.dto.User
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 import com.google.common.collect.Collections2.filter
 import com.google.common.collect.Iterables.filter
@@ -39,14 +50,32 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
-var selectedProduct: Product? = null
+private var selectedProduct: Product? = null
+private var uri: Uri? = null
+private lateinit var currentImagePath: String
+private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+private val viewModel: MainViewModel by viewModel<MainViewModel>()
+private var strUri by mutableStateOf("")
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-           // MainViewModel.FetchProducts()
+            // MainViewModel.FetchProducts()
+            viewModel.fetchProducts()
+            firebaseUser?.let {
+                val user = User(it.uid, "")
+                viewModel.user = user
+                // Something is needed in the MainViewModel or we need to add save
+                viewModel.save()
+            }
+
             val products = ArrayList<Product>()
             products.add(Product(product = "Tin Can", productId = 0))
             products.add(Product(product = "Car Door", productId = 1))
@@ -54,7 +83,7 @@ class MainActivity : ComponentActivity() {
             FindMyRecyclingTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background,
-                modifier = Modifier.fillMaxWidth()) {
+                    modifier = Modifier.fillMaxWidth()) {
                     RecycleSearch("Android", products)
                 }
             }
@@ -80,12 +109,12 @@ class MainActivity : ComponentActivity() {
                 Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
                 DropdownMenu(expanded = expanded, onDismissRequest = {expanded = false }) {
                     products.forEach{
-                        product -> DropdownMenuItem(onClick = {
-                          expanded = false
+                            product -> DropdownMenuItem(onClick = {
+                        expanded = false
                         productText = product.toString()
                         selectedProduct = product
                     }) {
-                            Text(text = product.toString())
+                        Text(text = product.toString())
                     }
                     }
                 }
@@ -115,7 +144,7 @@ class MainActivity : ComponentActivity() {
             //strSelectedData = value.text
             dropDownExpanded.value = true
             textFieldValue.value = value
-           // dropDownOptions.value =ProductIn.filter { it.toString().startsWith(value.text) && it.toString()}
+            // dropDownOptions.value =ProductIn.filter { it.toString().startsWith(value.text) && it.toString()}
         }
     }
 
@@ -138,9 +167,9 @@ class MainActivity : ComponentActivity() {
         var recyclable by remember{ mutableStateOf("")}
         var location by remember{ mutableStateOf("")}
         val context = LocalContext.current
-       // val i = ImageView(this).apply {
-       //     setImageResource(R.drawable.ic_hamburger_menu.)
-      //  }
+        // val i = ImageView(this).apply {
+        //     setImageResource(R.drawable.ic_hamburger_menu.)
+        //  }
         //var hamburger_Menu = ImageView(this).apply{
         //    setImageResource(R.drawable.ic_hamburger_menu)
         //}
@@ -156,14 +185,16 @@ class MainActivity : ComponentActivity() {
 
             OutlinedTextField(
                 value = recyclable,
-                onValueChange = {recyclable = it},
+                onValueChange = { recyclable = it },
                 label = { Text(stringResource(R.string.recyclable)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                    .border(width = 1.dp,
-                            color = Color.Black,
-                            shape = RoundedCornerShape(4.dp)),
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(4.dp)
+                    ),
             )
 
             OutlinedTextField(
@@ -173,22 +204,106 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                    .border(width = 1.dp,
-                            color = Color.Black,
-                            shape = RoundedCornerShape(4.dp)),
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(4.dp)
+                    ),
             )
-            Button (
-                onClick = {
-                   // Toast.makeText(context, "$name")
+
+            Row(modifier = Modifier.padding(all = 2.dp)) {
+                Button(
+                    onClick = {
+                        // Toast.makeText(context, "$name")
+                    }
+                )
+                {
+                    Text(text = "Save")
                 }
-                    )
-            {
-                Text(text = "Save")
+
+                Button(
+                    onClick = {
+                        takePhoto()
+                    }
+                )
+                {
+                    Text(text = "Photo")
+                }
             }
-
-
         }
     }
+
+    private fun takePhoto() {
+        if (hasCameraPermission() == PackageManager.PERMISSION_GRANTED && hasExternalStoragePermission() == PackageManager.PERMISSION_GRANTED) {
+            // The user has already granted permission for these activities.  Toggle the camera!
+            invokeCamera()
+        } else {
+            // The user has not granted permissions, so we must request.
+            requestMultiplePermissionsLauncher.launch(arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
+            ))
+        }
+    }
+
+    private val requestMultiplePermissionsLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()) {
+            resultsMap ->
+        var permissionGranted = false
+        resultsMap.forEach {
+            if (it.value == true) {
+                permissionGranted = it.value
+            } else {
+                permissionGranted = false
+                return@forEach
+            }
+        }
+        if (permissionGranted) {
+            invokeCamera()
+        } else {
+            Toast.makeText(this, "Unable to load camera without permission.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun invokeCamera() {
+        val file = createImageFile()
+        try {
+            uri = FileProvider.getUriForFile(this, "com.findmyrecycling.fileprovider", file)
+        } catch (e: Exception) {
+            Log.e(ContentValues.TAG, "Error: ${e.message}")
+            var foo = e.message
+        }
+        getCameraImage.launch(uri)
+    }
+
+    private fun createImageFile() : File {
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "Specimen_${timestamp}",
+            ".jpg",
+            imageDirectory
+        ).apply {
+            currentImagePath = absolutePath
+        }
+    }
+
+    private val getCameraImage = registerForActivityResult(ActivityResultContracts.TakePicture()) {
+            success ->
+        if (success) {
+            Log.i(ContentValues.TAG, "Image Location: $uri")
+            strUri = uri.toString()
+            val photo = Photo(localUri = uri.toString())
+            viewModel.photos.add(photo)
+        } else {
+            Log.e(ContentValues.TAG, "Image not saved. $uri")
+        }
+
+    }
+
+
+    fun hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+    fun hasExternalStoragePermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     @Preview(showBackground = true)
     @Composable
@@ -230,3 +345,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
+// Why is it a kotlin file and not a Class?
+// Watching the video "Upload the image in firebase cloud storage and link to firebase firestore database."
+// Issues in the MainViewModel as some parts of the code look incomplete.
