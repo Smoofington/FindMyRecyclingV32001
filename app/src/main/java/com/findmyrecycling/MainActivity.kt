@@ -60,19 +60,20 @@ import java.util.*
 import kotlin.collections.ArrayList
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-var selectedProduct: Product? = null
-private var uri: Uri? = null
-private lateinit var currentImagePath: String
-private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
-private val viewModel: MainViewModel by viewModel<MainViewModel>()
-private var inProductName: String = ""
-private var strUri by mutableStateOf("")
 
 class MainActivity : ComponentActivity() {
+
+    var selectedProduct: Product? = null
+    private var uri: Uri? = null
+    private lateinit var currentImagePath: String
+    private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+    private val viewModel: MainViewModel by viewModel<MainViewModel>()
+    private var inProductName: String = ""
+    private var strUri by mutableStateOf("")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-           // MainViewModel.FetchProducts()
             val products = ArrayList<Product>()
             products.add(Product(product = "Tin Can", productId = 0))
             products.add(Product(product = "Car Door", productId = 1))
