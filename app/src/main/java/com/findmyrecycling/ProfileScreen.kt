@@ -1,11 +1,8 @@
 package com.findmyrecycling
 
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -13,80 +10,82 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
+import com.findmyrecycling.dto.Facility
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
-import java.util.jar.Manifest
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-    class ProfileScreen : ComponentActivity() {
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            setContent {
-                FindMyRecyclingTheme {
-                    // A surface container using the 'background' color from the theme
-                    Surface(color = MaterialTheme.colors.background,
-                        modifier = Modifier.fillMaxWidth()) {
-                        ProfileOptions("Android")
-                    }
+class ProfileScreen : ComponentActivity() {
+    private val viewModel: MainViewModel by viewModel<MainViewModel>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            FindMyRecyclingTheme {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    color = MaterialTheme.colors.background,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    ProfileOptions("Android")
                 }
             }
         }
     }
 
+
     @Composable
-    fun MainMenu(){
+    fun MainMenu() {
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
             Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
-
         }
     }
 
     @Composable
     fun ProfileOptions(name: String) {
-        var facilityName by remember{ mutableStateOf("")}
-        var facilityLocation by remember{ mutableStateOf("")}
-        var facilityDetails by remember{ mutableStateOf("")}
-        var recyclableProduct by remember{ mutableStateOf("")}
+        var inFacilityName by remember { mutableStateOf("") }
+        var inFacilityLocation by remember { mutableStateOf("") }
+        var inFacilityDetails by remember { mutableStateOf("") }
+        var inRecyclableProduct by remember { mutableStateOf("") }
 
         Column {
             OutlinedTextField(
-                value = facilityName,
-                onValueChange = {facilityName = it},
+                value = inFacilityName,
+                onValueChange = { inFacilityName = it },
                 label = { Text(stringResource(R.string.facilityName)) },
                 modifier = Modifier.fillMaxWidth()
             )
-
-            // deleted a ) over here to compile.
-
             OutlinedTextField(
-                value = facilityLocation,
-                onValueChange = { facilityLocation = it },
+                value = inFacilityLocation,
+                onValueChange = { inFacilityLocation = it },
                 label = { Text(stringResource(R.string.facilityLocation)) },
                 modifier = Modifier.fillMaxWidth()
             )
-
             OutlinedTextField(
-                value = facilityDetails,
-                onValueChange = { facilityDetails = it },
+                value = inFacilityDetails,
+                onValueChange = { inFacilityDetails = it },
                 label = { Text(stringResource(R.string.facilityDetails)) },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
-                value = recyclableProduct,
-                onValueChange = { recyclableProduct = it },
+                value = inRecyclableProduct,
+                onValueChange = { inRecyclableProduct = it },
                 label = { Text(stringResource(R.string.recyclableProduct)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Row {
                 Button(
                     onClick = {
-                        // Toast.makeText(context, "$name")
+                        var facility = Facility().apply {
+                            this.facilityName = inFacilityName
+                            this.location = inFacilityLocation
+                            this.description = inFacilityDetails
+                            this.recyclableProducts = inRecyclableProduct
+                        }
+                        viewModel.save(facility)
                     }
-                )
-                {
+                ) {
                     Text(text = "Save")
                 }
                 Button(
@@ -109,3 +108,4 @@ import java.util.jar.Manifest
             ProfileOptions("Android")
         }
     }
+}
