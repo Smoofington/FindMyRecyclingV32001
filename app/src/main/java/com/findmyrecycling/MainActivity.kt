@@ -1,8 +1,10 @@
 package com.findmyrecycling
 
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.media.Image
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -185,7 +187,14 @@ class MainActivity : ComponentActivity() {
             {
                 Text(text = "Save")
             }
-
+            Button (
+                onClick = {
+                    addFacility()
+                }
+            )
+            {
+                Text(text = "Add Facility")
+            }
 
         }
     }
@@ -228,5 +237,10 @@ class MainActivity : ComponentActivity() {
         if (result.resultCode == ComponentActivity.RESULT_OK) {
             var user = FirebaseAuth.getInstance().currentUser
         }
+    }
+
+    fun addFacility() {
+        val intent = Intent(this, ProfileScreen::class.java)
+        startActivity(intent)
     }
 }
