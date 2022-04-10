@@ -4,13 +4,13 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.findmyrecycling.dto.Facility
 import com.findmyrecycling.dto.Product
 import com.findmyrecycling.dto.User
 import com.findmyrecycling.service.ProductService
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
-
-
+    
 import kotlinx.coroutines.launch
 import org.koin.core.component.getScopeId
 
@@ -18,7 +18,7 @@ import org.koin.core.component.getScopeId
 class MainViewModel(var productService: ProductService = ProductService()) : ViewModel() {
 
     var products: MutableLiveData<List<Product>> = MutableLiveData<List<Product>>()
-
+    var facility: MutableLiveData<List<Facility>> = MutableLiveData<List<Facility>>()
 
     var user: User? = null
     private lateinit var firestore: FirebaseFirestore
@@ -36,11 +36,10 @@ class MainViewModel(var productService: ProductService = ProductService()) : Vie
         }
     }
 
-    fun save(product: Product) {
-        val document = firestore.collection("product").document()
-        var productID = product.productId.toString()
-        productID = document.id
-        var handle = document.set(product)
+    fun save(facility: Facility) {
+        val document = firestore.collection("facility").document()
+        facility.facilityId = document.id
+        var handle = document.set(facility)
         handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
     }
 
