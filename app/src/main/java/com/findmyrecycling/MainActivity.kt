@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.ViewModel
+import coil.compose.AsyncImage
 import com.findmyrecycling.dto.Photo
 import com.findmyrecycling.dto.Product
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
@@ -56,13 +58,14 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 var selectedProduct: Product? = null
 private var uri: Uri? = null
 private lateinit var currentImagePath: String
 private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
 private val viewModel: MainViewModel by viewModel<MainViewModel>()
-private var inProducttName: String = ""
+private var inProductName: String = ""
 private var strUri by mutableStateOf("")
 
 class MainActivity : ComponentActivity() {
@@ -226,8 +229,10 @@ class MainActivity : ComponentActivity() {
                     Text(text = "Add Facility")
                 }
             }
+            AsyncImage(model = strUri, contentDescription= "Facility and/or Product image")
         }
     }
+
 
     private fun takePhoto() {
         if (hasCameraPermission() == PackageManager.PERMISSION_GRANTED && hasExternalStoragePermission() == PackageManager.PERMISSION_GRANTED) {
