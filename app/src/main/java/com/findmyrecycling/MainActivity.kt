@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.media.Image
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
@@ -41,10 +42,13 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 var selectedProduct: Product? = null
 
 class MainActivity : ComponentActivity() {
+
+    private var user: FirebaseUser? = FirebaseAuth.getInstance().currentUser
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -195,6 +199,13 @@ class MainActivity : ComponentActivity() {
             {
                 Text(text = "Add Facility")
             }
+            Button(
+                onClick = {
+                    signIn()
+                }
+            ) {
+                Text(text = "Logon")
+            }
 
         }
     }
@@ -206,13 +217,6 @@ class MainActivity : ComponentActivity() {
             RecycleSearch("Android")
         }
 
-        Button(
-            onClick = {
-                signIn()
-            }
-        ) {
-            Text(text = "Logon")
-        }
     }
 
     fun signIn() {
@@ -236,6 +240,9 @@ class MainActivity : ComponentActivity() {
         val response = result.idpResponse
         if (result.resultCode == ComponentActivity.RESULT_OK) {
             var user = FirebaseAuth.getInstance().currentUser
+        }
+        else{
+            Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode )
         }
     }
 
