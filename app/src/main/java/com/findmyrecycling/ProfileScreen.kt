@@ -23,11 +23,7 @@ class ProfileScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             FindMyRecyclingTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    color = MaterialTheme.colors.background,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxWidth()) {
                     ProfileOptions("Android")
                 }
             }

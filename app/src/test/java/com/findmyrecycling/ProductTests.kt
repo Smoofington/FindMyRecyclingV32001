@@ -23,7 +23,7 @@ class ProductTests {
     var rule: TestRule = InstantTaskExecutorRule()
 
     lateinit var productService : ProductService
-    var allProducts : List<Product>? = ArrayList<Product>()
+    private var allProducts : List<Product>? = ArrayList<Product>()
 
     lateinit var mvm : MainViewModel
 
@@ -76,7 +76,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsCellPhones = false
         allProducts!!.forEach {
-            if (it.product == ("Cell Phones")) {
+            if (it.product == "Cell Phones") {
                 containsCellPhones = true
             }
         }
@@ -88,7 +88,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsBatteries = false
         allProducts!!.forEach {
-            if (it.product == ("Rechargeable Batteries") || it.product == ("Lead Acid Batteries")) {
+            if (it.product == "Rechargeable Batteries" || it.product.equals("Lead Acid Batteries")) {
                 containsBatteries = true
             }
         }
@@ -100,7 +100,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsNothing = false
         allProducts!!.forEach {
-            if (it.product != ("Human Remains")) {
+            if (it.product != "Human Remains") {
                 containsNothing = true
             }
         }
@@ -133,7 +133,6 @@ class ProductTests {
         var allProducts : List<Product>? = ArrayList<Product>()
 
         val latch = CountDownLatch(1)
-        //creating a var observer assigning a static object
         val observer = object : Observer<List<Product>>{
             override fun onChanged(recievedProducts: List<Product>?) {
                 allProducts =  recievedProducts
@@ -147,7 +146,7 @@ class ProductTests {
         assertTrue(allProducts!!.isNotEmpty())
         var containsCellPhone = false
         allProducts!!.forEach {
-            if (it.product == ("Cell Phone")) {
+            if (it.product == "Cell Phone") {
                 containsCellPhone = true
             }
         }
