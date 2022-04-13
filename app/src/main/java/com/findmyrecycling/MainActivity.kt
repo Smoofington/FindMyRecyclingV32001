@@ -58,7 +58,6 @@ class MainActivity : ComponentActivity() {
             products.add(Product(product = "Car Door", productId = 1))
             products.add(Product(product = "Glass", productId = 2))
             FindMyRecyclingTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background,
                 modifier = Modifier.fillMaxWidth()) {
                     RecycleSearch("Android", products)
