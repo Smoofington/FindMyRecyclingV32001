@@ -50,7 +50,7 @@ class ProductTests {
         thenTheProductCollectionShouldContainCellPhones()
     }
     @Test
-    fun `Given product data are available when I search for batteries then I should receive a location of recycling center having lead acid batteries or rechargable batteries` () = runTest {
+    fun `Given product data are available when I search for batteries then I should receive a location of recycling center having lead acid batteries or rechargeable batteries` () = runTest {
         givenProductServiceIsInitialized()
         whenProductDataAreReadAndParsed()
         thenTheProductCollectionShouldContainBatteriesTypes()
@@ -116,7 +116,7 @@ class ProductTests {
 
     private fun givenViewModelIsInitializedWithMockData() {
         val products = ArrayList<Product>()
-        products.add(Product("Cell Phone", 1, "Cell Phone" ))
+        products.add(Product("Cell Phone", 1 ))
 
         coEvery {(mockProductService.fetchProducts())} returns products
 
