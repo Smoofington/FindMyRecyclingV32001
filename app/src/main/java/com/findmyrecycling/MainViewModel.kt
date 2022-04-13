@@ -104,4 +104,8 @@ class MainViewModel(var productService: ProductService = ProductService()) : Vie
         }
     }
 
+    fun listenToFacility() {
+        TODO("Not yet implemented")
+    }
+
 }

@@ -90,11 +90,11 @@ class ProfileScreen : ComponentActivity() {
                 }
                 Button(
                     onClick = {
-                        // Toast.makeText(context, "$name")
+
                     }
                 )
                 {
-                    Text(text = "Photo")
+                    Text(text = "Camera")
                 }
             }
 
