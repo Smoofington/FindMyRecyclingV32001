@@ -2,6 +2,7 @@ package com.findmyrecycling
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.graphics.drawable.Drawable
@@ -235,7 +236,7 @@ class MainActivity : ComponentActivity() {
                     Text(text = "Add Facility")
                 }
             }
-            AsyncImage(model = strUri, contentDescription = "Facility and/or Product image")
+            AsyncImage(model = strUri, contentDescription = "Facility image")
         }
     }
 
@@ -248,8 +249,9 @@ class MainActivity : ComponentActivity() {
             // The user has not granted permissions, so we must request.
             requestMultiplePermissionsLauncher.launch(
                 arrayOf(
+                    Manifest.permission.CAMERA,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.CAMERA
+
                 )
             )
         }
@@ -279,9 +281,9 @@ class MainActivity : ComponentActivity() {
     private fun invokeCamera() {
         val file = createImageFile()
         try {
-            uri = FileProvider.getUriForFile(this, "app.plantdiary.fileprovider", file)
+            uri = FileProvider.getUriForFile(this, "com.findmyrecycling.fileprovider", file)
         } catch (e: Exception) {
-            Log.e(ContentValues.TAG, "Error: ${e.message}")
+            Log.e(TAG, "Error: ${e.message}")
             var foo = e.message
         }
         getCameraImage.launch(uri)
@@ -291,7 +293,7 @@ class MainActivity : ComponentActivity() {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
-            "Specimen_${timestamp}",
+            "Facility_${timestamp}",
             ".jpg",
             imageDirectory
         ).apply {
