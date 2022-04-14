@@ -9,7 +9,6 @@ import android.graphics.drawable.Drawable
 import android.media.Image
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -325,13 +324,6 @@ class MainActivity : ComponentActivity() {
             RecycleSearch("Android")
         }
 
-        Button(
-            onClick = {
-                signIn()
-            }
-        ) {
-            Text(text = "Logon")
-        }
     }
 
     fun signIn() {
@@ -363,6 +355,9 @@ class MainActivity : ComponentActivity() {
             }
         } else {
             Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
+        }
+        else{
+            Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode )
         }
     }
 
