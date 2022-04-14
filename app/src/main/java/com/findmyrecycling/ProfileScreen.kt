@@ -1,6 +1,7 @@
 package com.findmyrecycling
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.findmyrecycling.dto.Facility
@@ -23,7 +25,10 @@ class ProfileScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             FindMyRecyclingTheme {
-                Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxWidth()) {
+                Surface(
+                    color = MaterialTheme.colors.background,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     ProfileOptions("Android")
                 }
             }
@@ -44,6 +49,7 @@ class ProfileScreen : ComponentActivity() {
         var inFacilityLocation by remember { mutableStateOf("") }
         var inFacilityDetails by remember { mutableStateOf("") }
         var inRecyclableProduct by remember { mutableStateOf("") }
+        val context = LocalContext.current
 
         Column {
             OutlinedTextField(
@@ -79,7 +85,12 @@ class ProfileScreen : ComponentActivity() {
                             this.description = inFacilityDetails
                             this.recyclableProducts = inRecyclableProduct
                         }
-                        viewModel.save(facility)
+                        viewModel.saveFacility()
+                        Toast.makeText(
+                            context,
+                            "$inFacilityName $inFacilityLocation $inFacilityDetails",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 ) {
                     Text(text = "Save")

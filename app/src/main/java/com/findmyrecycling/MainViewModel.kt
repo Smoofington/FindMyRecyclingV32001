@@ -24,14 +24,14 @@ import org.koin.core.component.getScopeId
 class MainViewModel(var productService: ProductService = ProductService()) : ViewModel() {
 
     val photos: ArrayList<Photo> = ArrayList<Photo>()
-    internal val NEW_PRODUCT = "New Product"
+    internal val NEW_FACILITY = "New Facility"
     var products: MutableLiveData<List<Product>> = MutableLiveData<List<Product>>()
     var facility: MutableLiveData<List<Facility>> = MutableLiveData<List<Facility>>()
-    var selectedProduct by mutableStateOf(Product())
+    var selectedFacility by mutableStateOf(Facility())
     var user: User? = null
 
     private lateinit var firestore: FirebaseFirestore
-    private var storageReference = FirebaseStorage.getInstance().getReference()
+    private val storageReference = FirebaseStorage.getInstance().getReference()
 
 
     init {
@@ -41,18 +41,10 @@ class MainViewModel(var productService: ProductService = ProductService()) : Vie
 
     fun fetchProducts() {
         viewModelScope.launch {
-            var innerProducts = productService.fetchProducts()
+            val innerProducts = productService.fetchProducts()
             products.postValue(innerProducts)
         }
     }
-
-    fun save(facility: Facility) {
-        val document = firestore.collection("facility").document()
-        facility.facilityId = document.id
-        var handle = document.set(facility)
-        handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
-    }
-
 
     private fun uploadPhotos() {
         photos.forEach {
@@ -78,16 +70,16 @@ class MainViewModel(var productService: ProductService = ProductService()) : Vie
     private fun updatePhotoDatabase(photo: Photo) {
         user?.let {
                 user ->
-            var photoCollection = firestore.collection("users").document(user.uid).collection("specimens").document(
-                selectedProduct?.productId.toString()
+            var photoCollection = firestore.collection("users").document(user.uid).collection("facilities").document(
+                selectedFacility?.facilityId.toString()
             ).collection("photos")
             var handle = photoCollection.add(photo)
             handle.addOnSuccessListener {
                 Log.i(ContentValues.TAG, "Successfully updated photo metadata")
                 photo.id = it.id
-                firestore.collection("users").document(user.uid).collection("specimens").document(
-                    selectedProduct.productId.toString()
-                ).collection("photos").document(photo.id).set(photo)
+                firestore.collection("users").document(user.uid).collection("facilities")
+                    .document(selectedFacility.facilityId).collection("photos").document(photo.id)
+                    .set(photo)
             }
             handle.addOnFailureListener {
                 Log.e(ContentValues.TAG, "Error updating photo data: ${it.message}")
@@ -105,7 +97,54 @@ class MainViewModel(var productService: ProductService = ProductService()) : Vie
     }
 
     fun listenToFacility() {
-        TODO("Not yet implemented")
+        user?.let { user ->
+            firestore.collection("users").document(user.uid).collection("facilities")
+                .addSnapshotListener { snapshot, e ->
+                    // handle the error if there is one, and the return
+                    if (e != null) {
+                        Log.w("Listen failed", e)
+                        return@addSnapshotListener
+                    }
+                    // if we reached this point, there was not an error
+                    snapshot?.let {
+                        val ALL_FACILITIES = ArrayList<Facility>()
+                        ALL_FACILITIES.add(Facility(facilityName = NEW_FACILITY))
+                        val DOCUMENTS = snapshot.documents
+                        DOCUMENTS.forEach {
+                            var facility = it.toObject(Facility::class.java)
+                            facility?.let {
+                                ALL_FACILITIES.add(it)
+                            }
+                        }
+                        facility.value = ALL_FACILITIES
+                    }
+                }
+        }
+    }
+
+    fun saveFacility() {
+        // checks to see if facility is already created. If so updates the record, if not then
+        // creates a new record
+        user?.let {
+            user ->
+                val document =
+                    if (selectedFacility.facilityId == null || selectedFacility.facilityId.isEmpty()) {
+                        firestore.collection("users").document(user.uid).collection("facilities")
+                            .document()
+                    } else {
+                        firestore.collection("users").document(user.uid).collection("facilities")
+                            .document(selectedFacility.facilityId)
+                    }
+                selectedFacility.facilityId = document.id
+                val handle = document.set(selectedFacility)
+                handle.addOnSuccessListener {
+                    Log.d("Firebase", "Document Saved")
+                    if (photos.isNotEmpty()) {
+                        uploadPhotos()
+                    }
+                }
+                handle.addOnFailureListener { Log.e("Firebase", "Save failed $it ") }
+        }
     }
 
 }

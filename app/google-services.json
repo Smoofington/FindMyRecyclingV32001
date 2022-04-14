@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "232675807517-ec6vqbfrmokl7b83pk2v80ohcla937ms.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.findmyrecycling",
+            "certificate_hash": "782bcc731af284cdee5aa13ca6dbdce3ebcb927f"
+          }
+        },
+        {
           "client_id": "232675807517-erd31nvne7fj019icocdgpb4881pukis.apps.googleusercontent.com",
           "client_type": 3
         }
