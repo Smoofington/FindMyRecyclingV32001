@@ -40,6 +40,7 @@ import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.ViewModel
 import coil.compose.AsyncImage
+import com.findmyrecycling.dto.Facility
 import com.findmyrecycling.dto.Photo
 import com.findmyrecycling.dto.Product
 import com.findmyrecycling.dto.User
@@ -66,6 +67,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MainActivity : ComponentActivity() {
 
     var selectedProduct: Product? = null
+    var selectedFacility: Facility? = null
     private var uri: Uri? = null
     private lateinit var currentImagePath: String
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
@@ -218,8 +220,8 @@ class MainActivity : ComponentActivity() {
             Row(modifier = Modifier.padding(all = 2.dp)) {
                 Button(
                     onClick = {
-                        // Toast.makeText(context, "$name")
-                    }
+
+                        }
                 )
                 {
                     Text(text = "Save")
@@ -239,6 +241,14 @@ class MainActivity : ComponentActivity() {
                 )
                 {
                     Text(text = "Add Facility")
+                }
+                Button(
+                    onClick = {
+                        signIn()
+                    }
+                )
+                {
+                    Text(text = "Log On")
                 }
             }
             AsyncImage(model = strUri, contentDescription = "Facility image")
@@ -318,8 +328,8 @@ class MainActivity : ComponentActivity() {
 
         }
 
-    fun hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-    fun hasExternalStoragePermission() =
+    private fun hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+    private fun hasExternalStoragePermission() =
         ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     @Preview(showBackground = true)
@@ -328,17 +338,9 @@ class MainActivity : ComponentActivity() {
         FindMyRecyclingTheme {
             RecycleSearch("Android")
         }
-
-        Button(
-            onClick = {
-                signIn()
-            }
-        ) {
-            Text(text = "Logon")
-        }
     }
 
-    fun signIn() {
+    private fun signIn() {
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
             AuthUI.IdpConfig.GoogleBuilder().build()
@@ -363,14 +365,14 @@ class MainActivity : ComponentActivity() {
                 val user = User(it.uid, it.displayName)
                 viewModel.user = user
                 viewModel.saveUser()
-                // viewModel.listenToFacility()
+                viewModel.listenToFacility()
             }
         } else {
             Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
         }
     }
 
-    fun addFacility() {
+    private fun addFacility() {
         val intent = Intent(this, ProfileScreen::class.java)
         startActivity(intent)
     }

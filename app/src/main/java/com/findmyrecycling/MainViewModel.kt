@@ -27,11 +27,11 @@ class MainViewModel(var productService: ProductService = ProductService()) : Vie
     internal val NEW_FACILITY = "New Facility"
     var products: MutableLiveData<List<Product>> = MutableLiveData<List<Product>>()
     var facility: MutableLiveData<List<Facility>> = MutableLiveData<List<Facility>>()
-    var selectedProduct by mutableStateOf(Product())
+    var selectedFacility by mutableStateOf(Facility())
     var user: User? = null
 
     private lateinit var firestore: FirebaseFirestore
-    private var storageReference = FirebaseStorage.getInstance().getReference()
+    private val storageReference = FirebaseStorage.getInstance().getReference()
 
 
     init {
@@ -41,18 +41,10 @@ class MainViewModel(var productService: ProductService = ProductService()) : Vie
 
     fun fetchProducts() {
         viewModelScope.launch {
-            var innerProducts = productService.fetchProducts()
+            val innerProducts = productService.fetchProducts()
             products.postValue(innerProducts)
         }
     }
-
-    fun save(facility: Facility) {
-        val document = firestore.collection("facility").document()
-        facility.facilityId = document.id
-        var handle = document.set(facility)
-        handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
-    }
-
 
     private fun uploadPhotos() {
         photos.forEach {
@@ -79,15 +71,15 @@ class MainViewModel(var productService: ProductService = ProductService()) : Vie
         user?.let {
                 user ->
             var photoCollection = firestore.collection("users").document(user.uid).collection("specimens").document(
-                selectedProduct?.productId.toString()
+                selectedFacility?.facilityId.toString()
             ).collection("photos")
             var handle = photoCollection.add(photo)
             handle.addOnSuccessListener {
                 Log.i(ContentValues.TAG, "Successfully updated photo metadata")
                 photo.id = it.id
-                firestore.collection("users").document(user.uid).collection("specimens").document(
-                    selectedProduct.productId.toString()
-                ).collection("photos").document(photo.id).set(photo)
+                firestore.collection("users").document(user.uid).collection("specimens")
+                    .document(selectedFacility.facilityId).collection("photos").document(photo.id)
+                    .set(photo)
             }
             handle.addOnFailureListener {
                 Log.e(ContentValues.TAG, "Error updating photo data: ${it.message}")
@@ -127,6 +119,31 @@ class MainViewModel(var productService: ProductService = ProductService()) : Vie
                         facility.value = ALL_FACILITIES
                     }
                 }
+        }
+    }
+
+    fun saveFacility() {
+        // checks to see if facility is already created. If so updates the record, if not then
+        // creates a new record
+        user?.let {
+            user ->
+                val document =
+                    if (selectedFacility.facilityId == null || selectedFacility.facilityId.isEmpty()) {
+                        firestore.collection("users").document(user.uid).collection("facilities")
+                            .document()
+                    } else {
+                        firestore.collection("users").document(user.uid).collection("facilities")
+                            .document(selectedFacility.facilityId)
+                    }
+                selectedFacility.facilityId = document.id
+                val handle = document.set(selectedFacility)
+                handle.addOnSuccessListener {
+                    Log.d("Firebase", "Document Saved")
+                    if (photos.isNotEmpty()) {
+                        uploadPhotos()
+                    }
+                }
+                handle.addOnFailureListener { Log.e("Firebase", "Save failed $it ") }
         }
     }
 
