@@ -24,7 +24,7 @@ import org.koin.core.component.getScopeId
 class MainViewModel(var productService: ProductService = ProductService()) : ViewModel() {
 
     val photos: ArrayList<Photo> = ArrayList<Photo>()
-    internal val NEW_PRODUCT = "New Product"
+    internal val NEW_FACILITY = "New Facility"
     var products: MutableLiveData<List<Product>> = MutableLiveData<List<Product>>()
     var facility: MutableLiveData<List<Facility>> = MutableLiveData<List<Facility>>()
     var selectedProduct by mutableStateOf(Product())
@@ -105,7 +105,29 @@ class MainViewModel(var productService: ProductService = ProductService()) : Vie
     }
 
     fun listenToFacility() {
-        TODO("Not yet implemented")
+        user?.let { user ->
+            firestore.collection("users").document(user.uid).collection("specimens")
+                .addSnapshotListener { snapshot, e ->
+                    // handle the error if there is one, and the return
+                    if (e != null) {
+                        Log.w("Listen failed", e)
+                        return@addSnapshotListener
+                    }
+                    // if we reached this point, there was not an error
+                    snapshot?.let {
+                        val ALL_FACILITIES = ArrayList<Facility>()
+                        ALL_FACILITIES.add(Facility(facilityName = NEW_FACILITY))
+                        val DOCUMENTS = snapshot.documents
+                        DOCUMENTS.forEach {
+                            var facility = it.toObject(Facility::class.java)
+                            facility?.let {
+                                ALL_FACILITIES.add(it)
+                            }
+                        }
+                        facility.value = ALL_FACILITIES
+                    }
+                }
+        }
     }
 
 }

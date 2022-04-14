@@ -80,6 +80,11 @@ class MainActivity : ComponentActivity() {
             products.add(Product(product = "Tin Can", productId = 0))
             products.add(Product(product = "Car Door", productId = 1))
             products.add(Product(product = "Glass", productId = 2))
+            firebaseUser?.let {
+                val user = User(it.uid, "")
+                viewModel.user = user
+                viewModel.listenToFacility()
+            }
             FindMyRecyclingTheme {
                 Surface(
                     color = MaterialTheme.colors.background,
@@ -252,30 +257,29 @@ class MainActivity : ComponentActivity() {
                     Manifest.permission.CAMERA,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
 
-                )
+                    )
             )
         }
     }
 
     private val requestMultiplePermissionsLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-        ) {
-            resultsMap ->
-                var permissionGranted = false
-                resultsMap.forEach {
-                    if (it.value == true) {
-                        permissionGranted = it.value
-                    } else {
-                        permissionGranted = false
-                        return@forEach
-                    }
-                }
-                if (permissionGranted) {
-                    invokeCamera()
-                } else {
-                    Toast.makeText(this, getString(R.string.cameraPermissionDenied), Toast.LENGTH_LONG)
-                        .show()
-                }
+    ) { resultsMap ->
+        var permissionGranted = false
+        resultsMap.forEach {
+            if (it.value == true) {
+                permissionGranted = it.value
+            } else {
+                permissionGranted = false
+                return@forEach
+            }
+        }
+        if (permissionGranted) {
+            invokeCamera()
+        } else {
+            Toast.makeText(this, getString(R.string.cameraPermissionDenied), Toast.LENGTH_LONG)
+                .show()
+        }
     }
 
     private fun invokeCamera() {
@@ -335,20 +339,20 @@ class MainActivity : ComponentActivity() {
     }
 
     fun signIn() {
-        val providers = arrayListOf(AuthUI.IdpConfig.EmailBuilder().build())
-        val signinIntent = AuthUI.getInstance()
+        val providers = arrayListOf(
+            AuthUI.IdpConfig.EmailBuilder().build(),
+            AuthUI.IdpConfig.GoogleBuilder().build()
+        )
+        val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
             .build()
-
-        signInLauncher.launch(signinIntent)
+        signInLauncher.launch(signInIntent)
     }
 
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
-    ) { res ->
-        this.signInResult(res)
-    }
+    ) { res -> this.signInResult(res) }
 
 
     private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
