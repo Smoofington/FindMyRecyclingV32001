@@ -1,8 +1,13 @@
 package com.findmyrecycling
 
+import android.Manifest
+import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.content.Intent
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.graphics.drawable.Drawable
 import android.media.Image
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,6 +15,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.border
@@ -28,8 +34,14 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.ViewModel
+import coil.compose.AsyncImage
+import com.findmyrecycling.dto.Photo
 import com.findmyrecycling.dto.Product
+import com.findmyrecycling.dto.User
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 import com.google.common.collect.Collections2.filter
 import com.google.common.collect.Iterables.filter
@@ -43,23 +55,35 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-var selectedProduct: Product? = null
 
 class MainActivity : ComponentActivity() {
 
-    private var user: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+    var selectedProduct: Product? = null
+    private var uri: Uri? = null
+    private lateinit var currentImagePath: String
+    private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+    private val viewModel: MainViewModel by viewModel<MainViewModel>()
+    private var inProductName: String = ""
+    private var strUri by mutableStateOf("")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-           // MainViewModel.FetchProducts()
             val products = ArrayList<Product>()
             products.add(Product(product = "Tin Can", productId = 0))
             products.add(Product(product = "Car Door", productId = 1))
             products.add(Product(product = "Glass", productId = 2))
             FindMyRecyclingTheme {
-                Surface(color = MaterialTheme.colors.background,
-                modifier = Modifier.fillMaxWidth()) {
+                Surface(
+                    color = MaterialTheme.colors.background,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     RecycleSearch("Android", products)
                 }
             }
@@ -67,10 +91,10 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ProductSpinner (products: List<Product>){
-        var productText by remember {mutableStateOf("Product List")}
-        var expanded by remember {mutableStateOf(false)}
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+    fun ProductSpinner(products: List<Product>) {
+        var productText by remember { mutableStateOf("Product List") }
+        var expanded by remember { mutableStateOf(false) }
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
 
             Row(Modifier
                 .padding(24.dp)
@@ -78,20 +102,20 @@ class MainActivity : ComponentActivity() {
                     expanded = !expanded
                 }
                 .padding(8.dp),
-                horizontalArrangement= Arrangement.Center,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = productText,fontSize =18.sp, modifier = Modifier.padding(end =8.dp))
+                Text(text = productText, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
                 Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
-                DropdownMenu(expanded = expanded, onDismissRequest = {expanded = false }) {
-                    products.forEach{
-                        product -> DropdownMenuItem(onClick = {
-                          expanded = false
-                        productText = product.toString()
-                        selectedProduct = product
-                    }) {
+                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    products.forEach { product ->
+                        DropdownMenuItem(onClick = {
+                            expanded = false
+                            productText = product.toString()
+                            selectedProduct = product
+                        }) {
                             Text(text = product.toString())
-                    }
+                        }
                     }
                 }
             }
@@ -99,7 +123,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ProfileMenu(){
+    fun ProfileMenu() {
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
             Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
 
@@ -107,20 +131,20 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun TextFieldWithDropdownUsage(data: List<Product>){
-        val dropDownOptions = remember{ mutableStateOf(listOf<Product>())}
-        val textFieldValue = remember {mutableStateOf(TextFieldValue())}
-        val dropDownExpanded = remember {mutableStateOf(false)}
+    fun TextFieldWithDropdownUsage(data: List<Product>) {
+        val dropDownOptions = remember { mutableStateOf(listOf<Product>()) }
+        val textFieldValue = remember { mutableStateOf(TextFieldValue()) }
+        val dropDownExpanded = remember { mutableStateOf(false) }
 
-        fun onDropdownDismissRequest(){
+        fun onDropdownDismissRequest() {
             dropDownExpanded.value = false
         }
 
-        fun onValueChanged(value: TextFieldValue){
+        fun onValueChanged(value: TextFieldValue) {
             //strSelectedData = value.text
             dropDownExpanded.value = true
             textFieldValue.value = value
-           // dropDownOptions.value =ProductIn.filter { it.toString().startsWith(value.text) && it.toString()}
+            // dropDownOptions.value =ProductIn.filter { it.toString().startsWith(value.text) && it.toString()}
         }
     }
 
@@ -133,19 +157,18 @@ class MainActivity : ComponentActivity() {
         dropDownExpanded: Boolean,
         list: List<Product>,
         label: String = ""
-    ){}
-
-
+    ) {
+    }
 
 
     @Composable
     fun RecycleSearch(name: String, products: List<Product> = ArrayList<Product>()) {
-        var recyclable by remember{ mutableStateOf("")}
-        var location by remember{ mutableStateOf("")}
+        var recyclable by remember { mutableStateOf("") }
+        var location by remember { mutableStateOf("") }
         val context = LocalContext.current
-       // val i = ImageView(this).apply {
-       //     setImageResource(R.drawable.ic_hamburger_menu.)
-      //  }
+        // val i = ImageView(this).apply {
+        //     setImageResource(R.drawable.ic_hamburger_menu.)
+        //  }
         //var hamburger_Menu = ImageView(this).apply{
         //    setImageResource(R.drawable.ic_hamburger_menu)
         //}
@@ -161,14 +184,16 @@ class MainActivity : ComponentActivity() {
 
             OutlinedTextField(
                 value = recyclable,
-                onValueChange = {recyclable = it},
+                onValueChange = { recyclable = it },
                 label = { Text(stringResource(R.string.recyclable)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                    .border(width = 1.dp,
-                            color = Color.Black,
-                            shape = RoundedCornerShape(4.dp)),
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(4.dp)
+                    ),
             )
 
             OutlinedTextField(
@@ -178,36 +203,119 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                    .border(width = 1.dp,
-                            color = Color.Black,
-                            shape = RoundedCornerShape(4.dp)),
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(4.dp)
+                    ),
             )
-            Button (
-                onClick = {
-                   // Toast.makeText(context, "$name")
+            Row(modifier = Modifier.padding(all = 2.dp)) {
+                Button(
+                    onClick = {
+                        // Toast.makeText(context, "$name")
+                    }
+                )
+                {
+                    Text(text = "Save")
                 }
-                    )
-            {
-                Text(text = "Save")
+                Button(
+                    onClick = {
+                        takePhoto()
+                    }
+                )
+                {
+                    Text(text = "Photo")
+                }
+                Button(
+                    onClick = {
+                        addFacility()
+                    }
+                )
+                {
+                    Text(text = "Add Facility")
+                }
             }
-            Button (
-                onClick = {
-                    addFacility()
-                }
+            AsyncImage(model = strUri, contentDescription = "Facility image")
+        }
+    }
+
+
+    private fun takePhoto() {
+        if (hasCameraPermission() == PERMISSION_GRANTED && hasExternalStoragePermission() == PERMISSION_GRANTED) {
+            // The user has already granted permission for these activities.  Toggle the camera!
+            invokeCamera()
+        } else {
+            // The user has not granted permissions, so we must request.
+            requestMultiplePermissionsLauncher.launch(
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+
+                )
             )
-            {
-                Text(text = "Add Facility")
-            }
-            Button(
-                onClick = {
-                    signIn()
+        }
+    }
+
+    private val requestMultiplePermissionsLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+        ) {
+            resultsMap ->
+                var permissionGranted = false
+                resultsMap.forEach {
+                    if (it.value == true) {
+                        permissionGranted = it.value
+                    } else {
+                        permissionGranted = false
+                        return@forEach
+                    }
                 }
-            ) {
-                Text(text = "Logon")
+                if (permissionGranted) {
+                    invokeCamera()
+                } else {
+                    Toast.makeText(this, getString(R.string.cameraPermissionDenied), Toast.LENGTH_LONG)
+                        .show()
+                }
+    }
+
+    private fun invokeCamera() {
+        val file = createImageFile()
+        try {
+            uri = FileProvider.getUriForFile(this, "com.findmyrecycling.fileprovider", file)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error: ${e.message}")
+            var foo = e.message
+        }
+        getCameraImage.launch(uri)
+    }
+
+    private fun createImageFile(): File {
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "Facility_${timestamp}",
+            ".jpg",
+            imageDirectory
+        ).apply {
+            currentImagePath = absolutePath
+        }
+    }
+
+    private val getCameraImage =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                Log.i(ContentValues.TAG, "Image Location: $uri")
+                strUri = uri.toString()
+                val photo = Photo(localUri = uri.toString())
+                viewModel.photos.add(photo)
+            } else {
+                Log.e(ContentValues.TAG, "Image not saved. $uri")
             }
 
         }
-    }
+
+    fun hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+    fun hasExternalStoragePermission() =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     @Preview(showBackground = true)
     @Composable
@@ -228,17 +336,25 @@ class MainActivity : ComponentActivity() {
         signInLauncher.launch(signinIntent)
     }
 
-    private val signInLauncher = registerForActivityResult (
+    private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
-    ) {
-            res -> this.signInResult(res)
+    ) { res ->
+        this.signInResult(res)
     }
 
 
     private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse
-        if (result.resultCode == ComponentActivity.RESULT_OK) {
-            var user = FirebaseAuth.getInstance().currentUser
+        if (result.resultCode == RESULT_OK) {
+            firebaseUser = FirebaseAuth.getInstance().currentUser
+            firebaseUser?.let {
+                val user = User(it.uid, it.displayName)
+                viewModel.user = user
+                viewModel.saveUser()
+                // viewModel.listenToFacility()
+            }
+        } else {
+            Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
         }
         else{
             Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode )
