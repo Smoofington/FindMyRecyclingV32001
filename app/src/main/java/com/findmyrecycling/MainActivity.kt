@@ -220,7 +220,7 @@ class MainActivity : ComponentActivity() {
             Row(modifier = Modifier.padding(all = 2.dp)) {
                 Button(
                     onClick = {
-
+                        viewModel.saveFacility()
                         }
                 )
                 {

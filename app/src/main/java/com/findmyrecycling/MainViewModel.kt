@@ -70,14 +70,14 @@ class MainViewModel(var productService: ProductService = ProductService()) : Vie
     private fun updatePhotoDatabase(photo: Photo) {
         user?.let {
                 user ->
-            var photoCollection = firestore.collection("users").document(user.uid).collection("specimens").document(
+            var photoCollection = firestore.collection("users").document(user.uid).collection("facilities").document(
                 selectedFacility?.facilityId.toString()
             ).collection("photos")
             var handle = photoCollection.add(photo)
             handle.addOnSuccessListener {
                 Log.i(ContentValues.TAG, "Successfully updated photo metadata")
                 photo.id = it.id
-                firestore.collection("users").document(user.uid).collection("specimens")
+                firestore.collection("users").document(user.uid).collection("facilities")
                     .document(selectedFacility.facilityId).collection("photos").document(photo.id)
                     .set(photo)
             }
@@ -98,7 +98,7 @@ class MainViewModel(var productService: ProductService = ProductService()) : Vie
 
     fun listenToFacility() {
         user?.let { user ->
-            firestore.collection("users").document(user.uid).collection("specimens")
+            firestore.collection("users").document(user.uid).collection("facilities")
                 .addSnapshotListener { snapshot, e ->
                     // handle the error if there is one, and the return
                     if (e != null) {
