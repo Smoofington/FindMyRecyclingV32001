@@ -5,14 +5,10 @@ import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
-import android.graphics.drawable.Drawable
-import android.media.Image
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import android.view.View
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -37,19 +33,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.content.res.ResourcesCompat
-import androidx.lifecycle.ViewModel
 import coil.compose.AsyncImage
 import com.findmyrecycling.dto.Photo
 import com.findmyrecycling.dto.Product
 import com.findmyrecycling.dto.User
-import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
-import com.google.common.collect.Collections2.filter
-import com.google.common.collect.Iterables.filter
-import com.google.common.collect.Iterators.filter
-import com.google.common.collect.Multisets.filter
-import com.google.common.collect.Sets.filter
-import java.util.Locale.filter
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -367,7 +354,7 @@ class MainActivity : ComponentActivity() {
     }
 
     fun addFacility() {
-        val intent = Intent(this, ProfileScreen::class.java)
+        val intent = Intent(this, AddNewFacilityActivity::class.java)
         startActivity(intent)
     }
 }

@@ -16,7 +16,7 @@ import com.findmyrecycling.dto.Facility
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ProfileScreen : ComponentActivity() {
+class AddNewFacilityActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
