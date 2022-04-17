@@ -138,23 +138,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @Composable
-    fun TextFieldWithDropdownUsage(data: List<Product>) {
-        val dropDownOptions = remember { mutableStateOf(listOf<Product>()) }
-        val textFieldValue = remember { mutableStateOf(TextFieldValue()) }
-        val dropDownExpanded = remember { mutableStateOf(false) }
-
-        fun onDropdownDismissRequest() {
-            dropDownExpanded.value = false
-        }
-
-        fun onValueChanged(value: TextFieldValue) {
-            //strSelectedData = value.text
-            dropDownExpanded.value = true
-            textFieldValue.value = value
-            // dropDownOptions.value =ProductIn.filter { it.toString().startsWith(value.text) && it.toString()}
-        }
-    }
 
 
     @Composable
@@ -176,7 +159,6 @@ class MainActivity : ComponentActivity() {
         Column {
 
             ProductSpinner(products = products)
-            //TextFieldWithDropdownUsage(dataIn = pr)
 
             OutlinedTextField(
                 value = recyclable,
