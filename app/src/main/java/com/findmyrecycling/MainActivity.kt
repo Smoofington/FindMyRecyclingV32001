@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable
 import android.media.Image
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -153,18 +154,6 @@ class MainActivity : ComponentActivity() {
             textFieldValue.value = value
             // dropDownOptions.value =ProductIn.filter { it.toString().startsWith(value.text) && it.toString()}
         }
-    }
-
-    @Composable
-    fun TextFieldWithDropdown(
-        modifier: Modifier = Modifier,
-        value: TextFieldValue,
-        setValue: (TextFieldValue) -> Unit,
-        onDismissRequest: () -> Unit,
-        dropDownExpanded: Boolean,
-        list: List<Product>,
-        label: String = ""
-    ) {
     }
 
 
@@ -369,9 +358,7 @@ class MainActivity : ComponentActivity() {
         } else {
             Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
         }
-        else{
-            Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode )
-        }
+
     }
 
     private fun addFacility() {
