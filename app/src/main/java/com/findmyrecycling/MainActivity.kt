@@ -142,16 +142,10 @@ class MainActivity : ComponentActivity() {
 
 
     @Composable
-    fun RecycleSearch(name: String, products: List<Product> = ArrayList<Product>()) {
-        var recyclable by remember { mutableStateOf("") }
+    fun RecycleSearch(name: String, products: List<Product> = ArrayList<Product>(), selectedProduct: Product = Product()) {
+        var recyclable by remember (selectedProduct.productId){ mutableStateOf(selectedProduct.product) }
         var location by remember { mutableStateOf("") }
         val context = LocalContext.current
-        // val i = ImageView(this).apply {
-        //     setImageResource(R.drawable.ic_hamburger_menu.)
-        //  }
-        //var hamburger_Menu = ImageView(this).apply{
-        //    setImageResource(R.drawable.ic_hamburger_menu)
-        //}
         Row {
             Arrangement.Center
             ProfileMenu()
