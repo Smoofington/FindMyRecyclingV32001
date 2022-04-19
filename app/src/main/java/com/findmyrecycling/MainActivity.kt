@@ -69,12 +69,11 @@ class MainActivity : ComponentActivity() {
 
     var selectedProduct: Product? = null
     var selectedFacility: Facility? = null
-    private var uri: Uri? = null
-    private lateinit var currentImagePath: String
+
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var inProductName: String = ""
-    private var strUri by mutableStateOf("")
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,6 +94,15 @@ class MainActivity : ComponentActivity() {
                 ) {
                     RecycleSearch("Android", products)
                 }
+            }
+
+            Button(
+                onClick = {
+                    signIn()
+                }
+            )
+            {
+                Text(text = "Log On")
             }
         }
     }
@@ -196,14 +204,7 @@ class MainActivity : ComponentActivity() {
                 {
                     Text(text = "Save", color = RecyclingBlue, fontSize = 17.sp)
                 }
-                Button(
-                    onClick = {
-                        takePhoto()
-                    }
-                )
-                {
-                    Text(text = "Photo", color = RecyclingBlue, fontSize = 17.sp)
-                }
+
                 Button(
                     onClick = {
                         addFacility()
@@ -212,101 +213,8 @@ class MainActivity : ComponentActivity() {
                 {
                     Text(text = "Add Facility", color = RecyclingBlue, fontSize = 17.sp)
                 }
-                Button(
-                    onClick = {
-                        signIn()
-                    }
-                )
-                {
-                    Text(text = "Log On", color = RecyclingBlue, fontSize = 17.sp)
-                }
-            }
-            AsyncImage(model = strUri, contentDescription = "Facility image")
-        }
-    }
-
-
-    private fun takePhoto() {
-        if (hasCameraPermission() == PERMISSION_GRANTED && hasExternalStoragePermission() == PERMISSION_GRANTED) {
-            // The user has already granted permission for these activities.  Toggle the camera!
-            invokeCamera()
-        } else {
-            // The user has not granted permissions, so we must request.
-            requestMultiplePermissionsLauncher.launch(
-                arrayOf(
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-
-                    )
-            )
-        }
-    }
-
-    private val requestMultiplePermissionsLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { resultsMap ->
-        var permissionGranted = false
-        resultsMap.forEach {
-            if (it.value == true) {
-                permissionGranted = it.value
-            } else {
-                permissionGranted = false
-                return@forEach
-            }
-        }
-        if (permissionGranted) {
-            invokeCamera()
-        } else {
-            Toast.makeText(this, getString(R.string.cameraPermissionDenied), Toast.LENGTH_LONG)
-                .show()
-        }
-    }
-
-    private fun invokeCamera() {
-        val file = createImageFile()
-        try {
-            uri = FileProvider.getUriForFile(this, "com.findmyrecycling.fileprovider", file)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error: ${e.message}")
-            var foo = e.message
-        }
-        getCameraImage.launch(uri)
-    }
-
-    private fun createImageFile(): File {
-        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "Facility_${timestamp}",
-            ".jpg",
-            imageDirectory
-        ).apply {
-            currentImagePath = absolutePath
-        }
-    }
-
-    private val getCameraImage =
-        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-            if (success) {
-                Log.i(ContentValues.TAG, "Image Location: $uri")
-                strUri = uri.toString()
-                val photo = Photo(localUri = uri.toString())
-                viewModel.photos.add(photo)
-            } else {
-                Log.e(ContentValues.TAG, "Image not saved. $uri")
             }
 
-        }
-
-    private fun hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-    private fun hasExternalStoragePermission() =
-        ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
-    @Preview(showBackground = true)
-    @Composable
-    fun DefaultPreview() {
-        FindMyRecyclingTheme {
-            RecycleSearch("Android")
         }
     }
 
@@ -346,5 +254,13 @@ class MainActivity : ComponentActivity() {
     private fun addFacility() {
         val intent = Intent(this, ProfileScreen::class.java)
         startActivity(intent)
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun DefaultPreview() {
+        FindMyRecyclingTheme {
+            RecycleSearch("Android")
+        }
     }
 }
