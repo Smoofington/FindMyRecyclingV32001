@@ -22,7 +22,7 @@ class ProductTests {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    lateinit var productService : ProductService
+    private lateinit var productService : ProductService
     private var allProducts : List<Product>? = ArrayList<Product>()
 
     lateinit var mvm : MainViewModel
