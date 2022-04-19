@@ -7,4 +7,5 @@ data class Facility(
     var description : String = "",
     var recyclableProducts : String = "",
 ) {
+
 }
