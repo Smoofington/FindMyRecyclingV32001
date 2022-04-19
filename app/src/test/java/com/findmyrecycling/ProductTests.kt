@@ -4,9 +4,15 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.findmyrecycling.dto.Product
 import com.findmyrecycling.service.ProductService
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.mockkStatic
 import junit.framework.Assert.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newSingleThreadContext
@@ -116,9 +122,16 @@ class ProductTests {
 
     private fun givenViewModelIsInitializedWithMockData() {
         val products = ArrayList<Product>()
-        products.add(Product("Cell Phone", 1 ))
+        products.add(Product("Cell Phone", 1, "Cell Phone Facility" ))
 
-        coEvery {(mockProductService.fetchProducts())} returns products
+        // mocks FirebaseAuth, FirebaseFirestore, FirebaseStorage
+        coEvery { mockProductService.fetchProducts() } returns products
+        mockkStatic(FirebaseAuth::class)
+        coEvery { FirebaseAuth.getInstance() } returns mockk(relaxed = true)
+        mockkStatic(FirebaseFirestore::class)
+        coEvery { FirebaseFirestore.getInstance() } returns mockk(relaxed = true)
+        mockkStatic(FirebaseStorage::class)
+        coEvery { FirebaseStorage.getInstance() } returns mockk(relaxed = true)
 
         mvm = MainViewModel(productService = mockProductService)
 
