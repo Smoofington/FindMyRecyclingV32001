@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -28,6 +29,8 @@ import coil.compose.AsyncImage
 import com.findmyrecycling.dto.Facility
 import com.findmyrecycling.dto.Photo
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
+import com.findmyrecycling.ui.theme.RecyclingBlue
+import com.findmyrecycling.ui.theme.RecyclingGray
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.text.SimpleDateFormat
@@ -73,26 +76,30 @@ class ProfileScreen : ComponentActivity() {
             OutlinedTextField(
                 value = inFacilityName,
                 onValueChange = { inFacilityName = it },
-                label = { Text(stringResource(R.string.facilityName)) },
+                label = { Text(stringResource(R.string.facilityName), fontSize = 17.sp, fontWeight = FontWeight.W800) },
                 modifier = Modifier.fillMaxWidth()
+                    .background(color = RecyclingGray)
             )
             OutlinedTextField(
                 value = inFacilityLocation,
                 onValueChange = { inFacilityLocation = it },
-                label = { Text(stringResource(R.string.facilityLocation)) },
+                label = { Text(stringResource(R.string.facilityLocation), fontSize = 17.sp, fontWeight = FontWeight.W800) },
                 modifier = Modifier.fillMaxWidth()
+                    .background(color = RecyclingGray)
             )
             OutlinedTextField(
                 value = inFacilityDetails,
                 onValueChange = { inFacilityDetails = it },
-                label = { Text(stringResource(R.string.facilityDetails)) },
+                label = { Text(stringResource(R.string.facilityDetails), fontSize = 17.sp, fontWeight = FontWeight.W800) },
                 modifier = Modifier.fillMaxWidth()
+                    .background(color = RecyclingGray)
             )
             OutlinedTextField(
                 value = inRecyclableProduct,
                 onValueChange = { inRecyclableProduct = it },
-                label = { Text(stringResource(R.string.recyclableProduct)) },
+                label = { Text(stringResource(R.string.recyclableProduct), fontSize = 17.sp, fontWeight = FontWeight.W800) },
                 modifier = Modifier.fillMaxWidth()
+                    .background(color = RecyclingGray)
             )
             Row {
                 Button(
@@ -111,7 +118,7 @@ class ProfileScreen : ComponentActivity() {
                         ).show()
                     }
                 ) {
-                    Text(text = "Save")
+                    Text(text = "Save", color = RecyclingBlue, fontSize = 17.sp)
                 }
                 Button(
                     onClick = {

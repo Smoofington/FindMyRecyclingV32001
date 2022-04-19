@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight.Companion.W800
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,16 +46,13 @@ import com.findmyrecycling.dto.Facility
 import com.findmyrecycling.dto.Photo
 import com.findmyrecycling.dto.Product
 import com.findmyrecycling.dto.User
-import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
+import com.findmyrecycling.ui.theme.*
 import com.google.common.collect.Collections2.filter
 import com.google.common.collect.Iterables.filter
 import com.google.common.collect.Iterators.filter
 import com.google.common.collect.Multisets.filter
 import com.google.common.collect.Sets.filter
 import java.util.Locale.filter
-import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
-import com.findmyrecycling.ui.theme.RecyclingBlue
-import com.findmyrecycling.ui.theme.RecyclingGray
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
@@ -152,16 +150,10 @@ class MainActivity : ComponentActivity() {
 
 
     @Composable
-    fun RecycleSearch(name: String, products: List<Product> = ArrayList<Product>()) {
-        var recyclable by remember { mutableStateOf("") }
+    fun RecycleSearch(name: String, products: List<Product> = ArrayList<Product>(), selectedProduct: Product = Product()) {
+        var recyclable by remember (selectedProduct.productId){ mutableStateOf(selectedProduct.product) }
         var location by remember { mutableStateOf("") }
         val context = LocalContext.current
-        // val i = ImageView(this).apply {
-        //     setImageResource(R.drawable.ic_hamburger_menu.)
-        //  }
-        //var hamburger_Menu = ImageView(this).apply{
-        //    setImageResource(R.drawable.ic_hamburger_menu)
-        //}
         Row {
             Arrangement.Center
             ProfileMenu()
@@ -174,7 +166,7 @@ class MainActivity : ComponentActivity() {
             OutlinedTextField(
                 value = recyclable,
                 onValueChange = { recyclable = it },
-                label = { Text(stringResource(R.string.recyclable)) },
+                label = { Text(stringResource(R.string.recyclable), fontSize = 17.sp, fontWeight = W800) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
@@ -189,7 +181,7 @@ class MainActivity : ComponentActivity() {
             OutlinedTextField(
                 value = location,
                 onValueChange = { location = it },
-                label = { Text(stringResource(R.string.location)) },
+                label = { Text(stringResource(R.string.location), fontSize = 17.sp, fontWeight = W800) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
@@ -201,7 +193,7 @@ class MainActivity : ComponentActivity() {
                     ),
             )
             Row(modifier = Modifier
-                .padding(all = 2.dp)
+                .padding(all = 2.dp) // maybe make 10
 
             ) {
                 Button(
@@ -210,7 +202,7 @@ class MainActivity : ComponentActivity() {
                         }
                 )
                 {
-                    Text(text = "Save")
+                    Text(text = "Save", color = RecyclingBlue, fontSize = 17.sp)
                 }
 
                 Button(
@@ -219,9 +211,8 @@ class MainActivity : ComponentActivity() {
                     }
                 )
                 {
-                    Text(text = "Add Facility")
+                    Text(text = "Add Facility", color = RecyclingBlue, fontSize = 17.sp)
                 }
-
             }
 
         }
