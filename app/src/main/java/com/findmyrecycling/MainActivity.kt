@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.border
@@ -52,6 +53,8 @@ import com.google.common.collect.Multisets.filter
 import com.google.common.collect.Sets.filter
 import java.util.Locale.filter
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
+import com.findmyrecycling.ui.theme.RecyclingBlue
+import com.findmyrecycling.ui.theme.RecyclingGray
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
@@ -175,6 +178,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
+                    .background(color = RecyclingGray)
                     .border(
                         width = 1.dp,
                         color = Color.Black,
@@ -189,13 +193,17 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
+                    .background(color = RecyclingGray)
                     .border(
                         width = 1.dp,
                         color = Color.Black,
                         shape = RoundedCornerShape(4.dp)
                     ),
             )
-            Row(modifier = Modifier.padding(all = 2.dp)) {
+            Row(modifier = Modifier
+                .padding(all = 2.dp)
+
+            ) {
                 Button(
                     onClick = {
                         viewModel.saveFacility()
