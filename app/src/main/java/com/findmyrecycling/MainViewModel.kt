@@ -1,6 +1,7 @@
 package com.findmyrecycling
 
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -23,15 +24,16 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(var productService: IProductService = ProductService()) : ViewModel() {
 
-    val photos: ArrayList<Photo> = ArrayList<Photo>()
+    val eventPhotos: MutableLiveData<List<Photo>> = MutableLiveData<List<Photo>>()
+    val photos: ArrayList<Photo> by mutableStateOf(ArrayList<Photo>())
     val NEW_FACILITY = "New Facility"
     var products: MutableLiveData<List<Product>> = MutableLiveData<List<Product>>()
     var facility: MutableLiveData<List<Facility>> = MutableLiveData<List<Facility>>()
     var selectedFacility by mutableStateOf(Facility())
     var user: User? = null
 
-    val storageReference = FirebaseStorage.getInstance().getReference()
-    lateinit var firestore: FirebaseFirestore
+    private val storageReference = FirebaseStorage.getInstance().getReference()
+    private lateinit var firestore: FirebaseFirestore
 
     init {
         firestore = FirebaseFirestore.getInstance()
@@ -54,7 +56,7 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
                         ALL_FACILITIES.add(Facility(facilityName = NEW_FACILITY))
                         val DOCUMENTS = snapshot.documents
                         DOCUMENTS.forEach {
-                            var facility = it.toObject(Facility::class.java)
+                            val facility = it.toObject(Facility::class.java)
                             facility?.let {
                                 ALL_FACILITIES.add(it)
                             }
@@ -75,8 +77,7 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
     fun saveFacility() {
         // checks to see if facility is already created. If so updates the record, if not then
         // creates a new record
-        user?.let {
-                user ->
+        user?.let { user ->
             val document =
                 if (selectedFacility.facilityId == null || selectedFacility.facilityId.isEmpty()) {
                     firestore.collection("users").document(user.uid).collection("facilities")
@@ -98,36 +99,41 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
     }
 
     private fun uploadPhotos() {
-        photos.forEach {
-                photo ->
+        photos.forEach { photo ->
             var uri = Uri.parse(photo.localUri)
             val imageRef = storageReference.child("images/${user?.uid}/${uri.lastPathSegment}")
-            val uploadTask  = imageRef.putFile(uri)
+            val uploadTask = imageRef.putFile(uri)
             uploadTask.addOnSuccessListener {
-                Log.i(ContentValues.TAG, "Image Uploaded $imageRef")
+                Log.i(TAG, "Image Uploaded $imageRef")
                 val downloadUrl = imageRef.downloadUrl
-                downloadUrl.addOnSuccessListener {
-                        remoteUri ->
+                downloadUrl.addOnSuccessListener { remoteUri ->
                     photo.remoteUri = remoteUri.toString()
                     updatePhotoDatabase(photo)
                 }
             }
             uploadTask.addOnFailureListener {
-                Log.e(ContentValues.TAG, it.message ?: "No message")
+                Log.e(TAG, it.message ?: "No message")
             }
         }
     }
 
-    private fun updatePhotoDatabase(photo: Photo) {
-        user?.let {
-                user ->
-            var photoCollection = firestore.collection("users").document(user.uid).collection("facilities").document(
-                selectedFacility?.facilityId.toString()
-            ).collection("photos")
-            var handle = photoCollection.add(photo)
+    internal fun updatePhotoDatabase(photo: Photo) {
+        user?.let { user ->
+            var photoDocument = if (photo.id.isEmpty()) {
+                // if there is no existing photo create new
+                firestore.collection("users").document(user.uid).collection("facilities")
+                    .document(selectedFacility.facilityId).collection("photos")
+                    .document()
+            } else {
+                // if there is an existing photo update record
+                firestore.collection("users").document(user.uid).collection("facilities")
+                    .document(selectedFacility.facilityId).collection("photos")
+                    .document(photo.id)
+            }
+            photo.id = photoDocument.id
+            var handle = photoDocument.set(photo)
             handle.addOnSuccessListener {
-                Log.i(ContentValues.TAG, "Successfully updated photo metadata")
-                photo.id = it.id
+                Log.i(TAG, "Successfully updated photo metadata")
                 firestore.collection("users").document(user.uid).collection("facilities")
                     .document(selectedFacility.facilityId).collection("photos").document(photo.id)
                     .set(photo)
@@ -146,8 +152,47 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
         }
     }
 
+    fun fetchPhotos() {
+        user?.let { user ->
+            var photoCollection =
+                firestore.collection("users").document(user.uid).collection("facilities")
+                    .document(selectedFacility.facilityId).collection("photos")
+            photoCollection.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+                querySnapshot?.let { querySnapshot ->
+                    var documents = querySnapshot.documents
+                    val inPhotos = ArrayList<Photo>()
+                    documents?.forEach {
+                        val photo = it.toObject(Photo::class.java)
+                        photo?.let { photo ->
+                            inPhotos.add(photo)
+                        }
+                    }
+                    eventPhotos.value = inPhotos
+                }
+            }
+        }
+    }
 
+    fun delete(photo: Photo) {
+        user?.let { user ->
+            val photoDocument =
+                firestore.collection("users").document(user.uid).collection("facilities")
+                    .document(selectedFacility.facilityId).collection("photos")
+            photoDocument.document(photo.id).delete()
+            val uri = Uri.parse(photo.localUri)
+            val imageRef = storageReference.child("images/${user.uid}/${uri.lastPathSegment}")
+            imageRef.delete()
+                .addOnSuccessListener {
+                    Log.i(TAG, "Photo binary file deleted ${photo}")
+                }
+                .addOnFailureListener {
+                    Log.e(TAG, "Photo delete failed. ${it.message}")
+                }
+        }
+    }
 
-
+    fun clearPhotos() {
+        photos.clear()
+    }
 
 }

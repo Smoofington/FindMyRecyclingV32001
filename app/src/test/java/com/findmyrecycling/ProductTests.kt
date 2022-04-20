@@ -124,8 +124,9 @@ class ProductTests {
         val products = ArrayList<Product>()
         products.add(Product("Cell Phone", 1, "Cell Phone Facility" ))
 
-        // mocks FirebaseAuth, FirebaseFirestore, FirebaseStorage
         coEvery { mockProductService.fetchProducts() } returns products
+
+        // mocks FirebaseAuth, FirebaseFirestore, FirebaseStorage
         mockkStatic(FirebaseAuth::class)
         coEvery { FirebaseAuth.getInstance() } returns mockk(relaxed = true)
         mockkStatic(FirebaseFirestore::class)

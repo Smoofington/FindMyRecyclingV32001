@@ -3,6 +3,7 @@ package com.findmyrecycling
 import android.Manifest
 import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.media.metrics.Event
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -11,15 +12,19 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -37,28 +42,30 @@ import coil.compose.AsyncImage
 import com.findmyrecycling.dto.Facility
 import com.findmyrecycling.dto.Photo
 import com.findmyrecycling.dto.Product
+import com.findmyrecycling.dto.User
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 import com.findmyrecycling.ui.theme.RecyclingBlue
 import com.findmyrecycling.ui.theme.RecyclingGray
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
-import com.google.firebase.auth.FacebookAuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class ProfileScreen : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var uri: Uri? = null
-    var selectedProduct: Product? = null
+    var selectedFacility: Facility? = null
     private lateinit var currentImagePath: String
     private var strUri by mutableStateOf("")
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+    private var inFacilityName: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,23 +75,23 @@ class ProfileScreen : ComponentActivity() {
                 viewModel.user = user
                 viewModel.listenToFacility()
             }
+            val facility by viewModel.facility.observeAsState(initial = emptyList())
             FindMyRecyclingTheme {
                 Surface(
                     color = MaterialTheme.colors.background,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    ProfileOptions("Android", viewModel.selectedFacility)
-
+                    ProfileOptions("Android", facility, viewModel.selectedFacility)
                 }
             }
         }
     }
+
 @Composable
-fun ProductSpinner(products: List<Product>) {
-    var productText by remember { mutableStateOf("Product List") }
+fun FacilitySpinner(facility: List<Facility>) {
+    var facilityText by remember { mutableStateOf("My Facilities") }
     var expanded by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-
         Row(Modifier
             .padding(24.dp)
             .clickable {
@@ -94,16 +101,33 @@ fun ProductSpinner(products: List<Product>) {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = productText, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
+            Text(text = facilityText, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
             Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
             DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                products.forEach { product ->
+                facility.forEach { facility ->
                     DropdownMenuItem(onClick = {
                         expanded = false
-                        productText = product.toString()
-                        selectedProduct = product
+                        if (facility.facilityName == viewModel.NEW_FACILITY) {
+                            // we have a new facility
+                            facilityText = "Add New Facility"
+                            facility.facilityName = ""
+                            viewModel.selectedFacility = facility
+                        } else {
+                            // we have selected an existing specimen
+                            facilityText = facility.toString()
+                            selectedFacility = Facility(
+                                facilityName = "",
+                                location = "",
+                                description = "",
+                                recyclableProducts = ""
+                            )
+                            inFacilityName = facility.facilityName
+                            viewModel.selectedFacility = facility
+                            viewModel.fetchPhotos()
+                        }
+
                     }) {
-                        Text(text = product.toString())
+                        Text(text = facility.toString())
                     }
                 }
             }
@@ -113,6 +137,7 @@ fun ProductSpinner(products: List<Product>) {
     @Composable
     fun ProfileOptions(
         name: String,
+        facility: List<Facility> = ArrayList<Facility>(),
         selectedFacility: Facility = Facility()
         ) {
         var inFacilityName by remember(selectedFacility.facilityId) { mutableStateOf(selectedFacility.facilityName) }
@@ -121,12 +146,13 @@ fun ProductSpinner(products: List<Product>) {
         var inRecyclableProduct by remember(selectedFacility.recyclableProducts) { mutableStateOf(selectedFacility.recyclableProducts) }
         val context = LocalContext.current
         Column {
-            ProductSpinner(products = products)
+            FacilitySpinner(facility = facility)
             OutlinedTextField(
                 value = inFacilityName,
                 onValueChange = { inFacilityName = it },
                 label = { Text(stringResource(R.string.facilityName), fontSize = 17.sp, fontWeight = FontWeight.W800) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
                     .background(color = RecyclingGray)
@@ -140,7 +166,8 @@ fun ProductSpinner(products: List<Product>) {
                 value = inFacilityLocation,
                 onValueChange = { inFacilityLocation = it },
                 label = { Text(stringResource(R.string.facilityLocation), fontSize = 17.sp, fontWeight = FontWeight.W800) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
                     .background(color = RecyclingGray)
@@ -154,7 +181,8 @@ fun ProductSpinner(products: List<Product>) {
                 value = inFacilityDescription,
                 onValueChange = { inFacilityDescription = it },
                 label = { Text(stringResource(R.string.facilityDetails), fontSize = 17.sp, fontWeight = FontWeight.W800) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
                     .background(color = RecyclingGray)
@@ -168,7 +196,8 @@ fun ProductSpinner(products: List<Product>) {
                 value = inRecyclableProduct,
                 onValueChange = { inRecyclableProduct = it },
                 label = { Text(stringResource(R.string.recyclableProduct), fontSize = 17.sp, fontWeight = FontWeight.W800) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .fillMaxWidth()
                     .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
                     .background(color = RecyclingGray)
@@ -212,12 +241,97 @@ fun ProductSpinner(products: List<Product>) {
                     }
                 )
                 {
-                    Text(text = "Log On")
+                    Text(text = "Log On", color = RecyclingBlue, fontSize = 17.sp)
                 }
             }
-            AsyncImage(model = strUri, contentDescription = "Facility image")
+            Events()
         }
     }
+
+    @Composable
+    private fun Events() {
+        val photos by viewModel.eventPhotos.observeAsState(initial = emptyList())
+        LazyColumn(
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.fillMaxHeight()
+            ) {
+            items(
+                items = photos,
+                itemContent = {
+                    EventListItem(photo = it)
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun EventListItem(photo: Photo) {
+        var inDescription by remember(photo.id) { mutableStateOf(photo.description) }
+        Card(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).fillMaxWidth(),
+            elevation = 8.dp,
+            backgroundColor = MaterialTheme.colors.background,
+            shape = RoundedCornerShape(20.dp),
+            border = BorderStroke(1.dp, Color.Green)
+        )
+        {
+            Row {
+                Column(Modifier.weight(2f)) {
+                    AsyncImage(model = photo.localUri, contentDescription = "Event Image")
+                    Modifier
+                        .width(64.dp)
+                        .height(64.dp)
+                }
+
+                Column(Modifier.weight(4f)) {
+                    Text(text = photo.id, style = MaterialTheme.typography.h6)
+                    Text(text = photo.dateTaken.toString(), style = MaterialTheme.typography.caption)
+                    OutlinedTextField(
+                        value = inDescription,
+                        onValueChange = { inDescription = it },
+                        label = { Text(stringResource(R.string.Description)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Column(Modifier.weight(1f)) {
+                    Button(
+                        onClick = {
+                            photo.description = inDescription
+                            save(photo)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = stringResource(R.string.Save),
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            photo.description = inDescription
+                            delete(photo)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = stringResource(R.string.Delete),
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun delete(photo: Photo) {
+        viewModel.delete(photo)
+    }
+
+    private fun save(photo: Photo) {
+        viewModel.updatePhotoDatabase(photo)
+    }
+
     private fun takePhoto() {
         if (hasCameraPermission() == PackageManager.PERMISSION_GRANTED && hasExternalStoragePermission() == PackageManager.PERMISSION_GRANTED) {
             // The user has already granted permission for these activities.  Toggle the camera!
@@ -286,7 +400,6 @@ fun ProductSpinner(products: List<Product>) {
             } else {
                 Log.e(ContentValues.TAG, "Image not saved. $uri")
             }
-
         }
 
     private fun hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)

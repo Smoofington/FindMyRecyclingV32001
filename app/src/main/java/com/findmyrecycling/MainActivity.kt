@@ -73,13 +73,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MainActivity : ComponentActivity() {
 
     var selectedProduct: Product? = null
-    var selectedFacility: Facility? = null
     private var strSelectedData: String =""
-    private var uri: Uri? = null
-    private lateinit var currentImagePath: String
-    private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
-    private var inProductName: String = ""
     private var strUri by mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,11 +82,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             viewModel.fetchProducts()
             val products by viewModel.products.observeAsState(initial = emptyList())
-            firebaseUser?.let {
-                val user = User(it.uid, "")
-                viewModel.user = user
-                viewModel.listenToFacility()
-            }
             FindMyRecyclingTheme {
                 Surface(
                     color = MaterialTheme.colors.background,
@@ -104,46 +94,12 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ProductSpinner(products: List<Product>) {
-        var productText by remember { mutableStateOf("Product List") }
-        var expanded by remember { mutableStateOf(false) }
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-
-            Row(Modifier
-                .padding(24.dp)
-                .clickable {
-                    expanded = !expanded
-                }
-                .padding(8.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = productText, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
-                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
-                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    products.forEach { product ->
-                        DropdownMenuItem(onClick = {
-                            expanded = false
-                            productText = product.toString()
-                            selectedProduct = product
-                        }) {
-                            Text(text = product.toString())
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
-    @Composable
     fun RecycleSearch(name: String, products : List<Product> = ArrayList<Product>(), selectedProduct: Product = Product()) {
         var recyclable by remember (selectedProduct.productId){ mutableStateOf(selectedProduct.product) }
         var location by remember { mutableStateOf("") }
         val context = LocalContext.current
         Row {
             Arrangement.Center
-            //ProfileMenu()
         }
 
         Column {
@@ -181,20 +137,11 @@ class MainActivity : ComponentActivity() {
                 {
                     Text(text = "Add Facility", color = RecyclingBlue, fontSize = 17.sp)
                 }
-                Button(
-                    onClick = {
-                        signIn()
-                    }
-                )
-                {
-                    Text(text = "Log On", color = RecyclingBlue, fontSize = 17.sp)
-                }
             }
             AsyncImage(model = strUri, contentDescription = "Facility image")
         }
     }
 
-    //list of stuff added
     @Composable
     fun TextFieldWithDropdownUsage(dataIn: List<Product>, label : String = "", take :Int = 3, selectedProduct : Product = Product()) {
 
@@ -217,7 +164,6 @@ class MainActivity : ComponentActivity() {
 
         TextFieldWithDropdown(
             modifier = Modifier.fillMaxWidth()
-
                 .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
                 .background(color = RecyclingGray)
                 .border(
@@ -237,7 +183,6 @@ class MainActivity : ComponentActivity() {
     fun TextFieldWithDropdown(
         modifier: Modifier = Modifier,
         value: TextFieldValue,
-        //fontWeight: FontWeight,
         setValue: (TextFieldValue) -> Unit,
         onDismissRequest: () -> Unit,
         dropDownExpanded: Boolean,
@@ -284,86 +229,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
-
-
-    //end of stuff added
-    private fun takePhoto() {
-        if (hasCameraPermission() == PERMISSION_GRANTED && hasExternalStoragePermission() == PERMISSION_GRANTED) {
-            // The user has already granted permission for these activities.  Toggle the camera!
-            invokeCamera()
-        } else {
-            // The user has not granted permissions, so we must request.
-            requestMultiplePermissionsLauncher.launch(
-                arrayOf(
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-
-                    )
-            )
-        }
-    }
-
-    private val requestMultiplePermissionsLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { resultsMap ->
-        var permissionGranted = false
-        resultsMap.forEach {
-            if (it.value == true) {
-                permissionGranted = it.value
-            } else {
-                permissionGranted = false
-                return@forEach
-            }
-        }
-        if (permissionGranted) {
-            invokeCamera()
-        } else {
-            Toast.makeText(this, getString(R.string.cameraPermissionDenied), Toast.LENGTH_LONG)
-                .show()
-        }
-    }
-
-    private fun invokeCamera() {
-        val file = createImageFile()
-        try {
-            uri = FileProvider.getUriForFile(this, "com.findmyrecycling.fileprovider", file)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error: ${e.message}")
-            var foo = e.message
-        }
-        getCameraImage.launch(uri)
-    }
-
-    private fun createImageFile(): File {
-        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "Facility_${timestamp}",
-            ".jpg",
-            imageDirectory
-        ).apply {
-            currentImagePath = absolutePath
-        }
-    }
-
-    private val getCameraImage =
-        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-            if (success) {
-                Log.i(ContentValues.TAG, "Image Location: $uri")
-                strUri = uri.toString()
-                val photo = Photo(localUri = uri.toString())
-                viewModel.photos.add(photo)
-            } else {
-                Log.e(ContentValues.TAG, "Image not saved. $uri")
-            }
-
-        }
-
-    private fun hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-    private fun hasExternalStoragePermission() =
-        ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     @Preview(showBackground = true)
     @Composable
