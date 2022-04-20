@@ -77,8 +77,7 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
     fun saveFacility() {
         // checks to see if facility is already created. If so updates the record, if not then
         // creates a new record
-        user?.let {
-                user ->
+        user?.let { user ->
             val document =
                 if (selectedFacility.facilityId == null || selectedFacility.facilityId.isEmpty()) {
                     firestore.collection("users").document(user.uid).collection("facilities")
@@ -100,29 +99,26 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
     }
 
     private fun uploadPhotos() {
-        photos.forEach {
-                photo ->
+        photos.forEach { photo ->
             var uri = Uri.parse(photo.localUri)
             val imageRef = storageReference.child("images/${user?.uid}/${uri.lastPathSegment}")
-            val uploadTask  = imageRef.putFile(uri)
+            val uploadTask = imageRef.putFile(uri)
             uploadTask.addOnSuccessListener {
-                Log.i(ContentValues.TAG, "Image Uploaded $imageRef")
+                Log.i(TAG, "Image Uploaded $imageRef")
                 val downloadUrl = imageRef.downloadUrl
-                downloadUrl.addOnSuccessListener {
-                        remoteUri ->
+                downloadUrl.addOnSuccessListener { remoteUri ->
                     photo.remoteUri = remoteUri.toString()
                     updatePhotoDatabase(photo)
                 }
             }
             uploadTask.addOnFailureListener {
-                Log.e(ContentValues.TAG, it.message ?: "No message")
+                Log.e(TAG, it.message ?: "No message")
             }
         }
     }
 
     internal fun updatePhotoDatabase(photo: Photo) {
-        user?.let {
-                user ->
+        user?.let { user ->
             var photoDocument = if (photo.id.isEmpty()) {
                 // if there is no existing photo create new
                 firestore.collection("users").document(user.uid).collection("facilities")
@@ -157,21 +153,17 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
     }
 
     fun fetchPhotos() {
-        photos.clear()
-        user?.let {
-            user ->
-            var photoCollection = firestore.collection("users").document(user.uid).collection("facilities")
-                .document(selectedFacility.facilityId).collection("photos")
-            photoCollection.addSnapshotListener {
-                querySnapshot, firebaseFirestoreException ->
-                querySnapshot?.let {
-                    querySnapshot ->
+        user?.let { user ->
+            var photoCollection =
+                firestore.collection("users").document(user.uid).collection("facilities")
+                    .document(selectedFacility.facilityId).collection("photos")
+            photoCollection.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+                querySnapshot?.let { querySnapshot ->
                     var documents = querySnapshot.documents
                     val inPhotos = ArrayList<Photo>()
                     documents?.forEach {
                         val photo = it.toObject(Photo::class.java)
-                        photo?.let {
-                            photo ->
+                        photo?.let { photo ->
                             inPhotos.add(photo)
                         }
                     }
@@ -182,8 +174,7 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
     }
 
     fun delete(photo: Photo) {
-        user?.let {
-                user ->
+        user?.let { user ->
             val photoDocument =
                 firestore.collection("users").document(user.uid).collection("facilities")
                     .document(selectedFacility.facilityId).collection("photos")
