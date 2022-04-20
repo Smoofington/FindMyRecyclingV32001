@@ -71,14 +71,14 @@ class ProfileScreen : ComponentActivity() {
         }
     }
 
-
+/*
     @Composable
     fun MainMenu() {
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
             Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
         }
     }
-
+*/
     @Composable
     fun ProfileOptions(
         name: String,
