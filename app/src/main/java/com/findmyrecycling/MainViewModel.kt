@@ -1,6 +1,7 @@
 package com.findmyrecycling
 
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -23,7 +24,8 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(var productService: IProductService = ProductService()) : ViewModel() {
 
-    val photos: ArrayList<Photo> = ArrayList<Photo>()
+    val eventPhotos: MutableLiveData<List<Photo>> = MutableLiveData<List<Photo>>()
+    val photos: ArrayList<Photo> by mutableStateOf(ArrayList<Photo>())
     val NEW_FACILITY = "New Facility"
     var products: MutableLiveData<List<Product>> = MutableLiveData<List<Product>>()
     var facility: MutableLiveData<List<Facility>> = MutableLiveData<List<Facility>>()
@@ -118,16 +120,24 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
         }
     }
 
-    private fun updatePhotoDatabase(photo: Photo) {
+    internal fun updatePhotoDatabase(photo: Photo) {
         user?.let {
                 user ->
-            var photoCollection = firestore.collection("users").document(user.uid).collection("facilities").document(
-                selectedFacility?.facilityId.toString()
-            ).collection("photos")
-            var handle = photoCollection.add(photo)
+            var photoDocument = if (photo.id.isEmpty()) {
+                // if there is no existing photo create new
+                firestore.collection("users").document(user.uid).collection("facilities")
+                    .document(selectedFacility.facilityId).collection("photos")
+                    .document()
+            } else {
+                // if there is an existing photo update record
+                firestore.collection("users").document(user.uid).collection("facilities")
+                    .document(selectedFacility.facilityId).collection("photos")
+                    .document(photo.id)
+            }
+            photo.id = photoDocument.id
+            var handle = photoDocument.set(photo)
             handle.addOnSuccessListener {
-                Log.i(ContentValues.TAG, "Successfully updated photo metadata")
-                photo.id = it.id
+                Log.i(TAG, "Successfully updated photo metadata")
                 firestore.collection("users").document(user.uid).collection("facilities")
                     .document(selectedFacility.facilityId).collection("photos").document(photo.id)
                     .set(photo)
@@ -146,8 +156,48 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
         }
     }
 
+    fun fetchPhotos() {
+        photos.clear()
+        user?.let {
+            user ->
+            var photoCollection = firestore.collection("users").document(user.uid).collection("facilities")
+                .document(selectedFacility.facilityId).collection("photos")
+            photoCollection.addSnapshotListener {
+                querySnapshot, firebaseFirestoreException ->
+                querySnapshot?.let {
+                    querySnapshot ->
+                    var documents = querySnapshot.documents
+                    val inPhotos = ArrayList<Photo>()
+                    documents?.forEach {
+                        val photo = it.toObject(Photo::class.java)
+                        photo?.let {
+                            photo ->
+                            inPhotos.add(photo)
+                        }
+                    }
+                    eventPhotos.value = inPhotos
+                }
+            }
+        }
+    }
 
-
-
+    fun delete(photo: Photo) {
+        user?.let {
+                user ->
+            val photoDocument =
+                firestore.collection("users").document(user.uid).collection("facilities")
+                    .document(selectedFacility.facilityId).collection("photos")
+            photoDocument.document(photo.id).delete()
+            val uri = Uri.parse(photo.localUri)
+            val imageRef = storageReference.child("images/${user.uid}/${uri.lastPathSegment}")
+            imageRef.delete()
+                .addOnSuccessListener {
+                    Log.i(TAG, "Photo binary file deleted ${photo}")
+                }
+                .addOnFailureListener {
+                    Log.e(TAG, "Photo delete failed. ${it.message}")
+                }
+        }
+    }
 
 }

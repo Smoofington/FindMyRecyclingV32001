@@ -8,6 +8,6 @@ data class Facility(
     var recyclableProducts : String = "",
 ) {
     override fun toString(): String {
-        return "$facilityName $description $location"
+        return "$facilityName"
     }
 }

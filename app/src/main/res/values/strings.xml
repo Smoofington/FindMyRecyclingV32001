@@ -10,4 +10,7 @@
     <string name="facilityDetails">Facility Details</string>
     <string name="recyclableProduct">Recyclable Product</string>
     <string name="cameraPermissionDenied">Unable to load camera without permission.</string>
+    <string name="Description">Description</string>
+    <string name="Save">Save</string>
+    <string name="Delete">Delete</string>
 </resources>
