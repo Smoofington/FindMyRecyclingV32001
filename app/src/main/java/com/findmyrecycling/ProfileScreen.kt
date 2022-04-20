@@ -12,24 +12,31 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.findmyrecycling.dto.Facility
 import com.findmyrecycling.dto.Photo
-import com.findmyrecycling.dto.User
+import com.findmyrecycling.dto.Product
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 import com.findmyrecycling.ui.theme.RecyclingBlue
 import com.findmyrecycling.ui.theme.RecyclingGray
@@ -48,6 +55,7 @@ class ProfileScreen : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var uri: Uri? = null
+    var selectedProduct: Product? = null
     private lateinit var currentImagePath: String
     private var strUri by mutableStateOf("")
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
@@ -66,19 +74,42 @@ class ProfileScreen : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     ProfileOptions("Android", viewModel.selectedFacility)
+
                 }
             }
         }
     }
+@Composable
+fun ProductSpinner(products: List<Product>) {
+    var productText by remember { mutableStateOf("Product List") }
+    var expanded by remember { mutableStateOf(false) }
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
 
-/*
-    @Composable
-    fun MainMenu() {
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-            Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
+        Row(Modifier
+            .padding(24.dp)
+            .clickable {
+                expanded = !expanded
+            }
+            .padding(8.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = productText, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
+            Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                products.forEach { product ->
+                    DropdownMenuItem(onClick = {
+                        expanded = false
+                        productText = product.toString()
+                        selectedProduct = product
+                    }) {
+                        Text(text = product.toString())
+                    }
+                }
+            }
         }
     }
-*/
+}
     @Composable
     fun ProfileOptions(
         name: String,
@@ -90,35 +121,65 @@ class ProfileScreen : ComponentActivity() {
         var inRecyclableProduct by remember(selectedFacility.recyclableProducts) { mutableStateOf(selectedFacility.recyclableProducts) }
         val context = LocalContext.current
         Column {
+            ProductSpinner(products = products)
             OutlinedTextField(
                 value = inFacilityName,
                 onValueChange = { inFacilityName = it },
                 label = { Text(stringResource(R.string.facilityName), fontSize = 17.sp, fontWeight = FontWeight.W800) },
                 modifier = Modifier.fillMaxWidth()
+                    .fillMaxWidth()
+                    .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
                     .background(color = RecyclingGray)
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(4.dp)
+                    ),
             )
             OutlinedTextField(
                 value = inFacilityLocation,
                 onValueChange = { inFacilityLocation = it },
                 label = { Text(stringResource(R.string.facilityLocation), fontSize = 17.sp, fontWeight = FontWeight.W800) },
                 modifier = Modifier.fillMaxWidth()
+                    .fillMaxWidth()
+                    .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
                     .background(color = RecyclingGray)
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(4.dp)
+                    ),
             )
             OutlinedTextField(
                 value = inFacilityDescription,
                 onValueChange = { inFacilityDescription = it },
                 label = { Text(stringResource(R.string.facilityDetails), fontSize = 17.sp, fontWeight = FontWeight.W800) },
                 modifier = Modifier.fillMaxWidth()
+                    .fillMaxWidth()
+                    .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
                     .background(color = RecyclingGray)
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(4.dp)
+                    ),
             )
             OutlinedTextField(
                 value = inRecyclableProduct,
                 onValueChange = { inRecyclableProduct = it },
                 label = { Text(stringResource(R.string.recyclableProduct), fontSize = 17.sp, fontWeight = FontWeight.W800) },
                 modifier = Modifier.fillMaxWidth()
+                    .fillMaxWidth()
+                    .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
                     .background(color = RecyclingGray)
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(4.dp)
+                    ),
             )
-            Row {
+            Row(modifier = Modifier
+                .padding(all = 2.dp)) {
                 Button(
                     onClick = {
                         selectedFacility.apply {
@@ -143,7 +204,7 @@ class ProfileScreen : ComponentActivity() {
                     }
                 )
                 {
-                    Text(text = "Photo")
+                    Text(text = "Photo", color = RecyclingBlue, fontSize = 17.sp)
                 }
                 Button(
                     onClick = {
