@@ -197,7 +197,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun addFacility() {
-        val intent = Intent(this, ProfileScreen::class.java)
+        val intent = Intent(this, NewFacilityActivity::class.java)
         startActivity(intent)
     }
 }

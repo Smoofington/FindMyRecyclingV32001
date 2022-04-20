@@ -26,7 +26,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ProfileScreen"
+        <activity android:name=".NewFacilityActivity"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />

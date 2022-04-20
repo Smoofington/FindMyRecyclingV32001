@@ -54,7 +54,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ProfileScreen : ComponentActivity() {
+class NewFacilityActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var uri: Uri? = null
