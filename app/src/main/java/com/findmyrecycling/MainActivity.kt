@@ -68,10 +68,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MainActivity : ComponentActivity() {
 
     var selectedProduct: Product? = null
-    var selectedFacility: Facility? = null
 
-    private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
-    private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var inProductName: String = ""
 
 
@@ -82,11 +79,6 @@ class MainActivity : ComponentActivity() {
             products.add(Product(product = "Tin Can", productId = 0))
             products.add(Product(product = "Car Door", productId = 1))
             products.add(Product(product = "Glass", productId = 2))
-            firebaseUser?.let {
-                val user = User(it.uid, "")
-                viewModel.user = user
-                viewModel.listenToFacility()
-            }
             FindMyRecyclingTheme {
                 Surface(
                     color = MaterialTheme.colors.background,
@@ -94,15 +86,6 @@ class MainActivity : ComponentActivity() {
                 ) {
                     RecycleSearch("Android", products)
                 }
-            }
-
-            Button(
-                onClick = {
-                    signIn()
-                }
-            )
-            {
-                Text(text = "Log On")
             }
         }
     }
@@ -196,14 +179,6 @@ class MainActivity : ComponentActivity() {
                 .padding(all = 2.dp) // maybe make 10
 
             ) {
-                Button(
-                    onClick = {
-                        viewModel.saveFacility()
-                        }
-                )
-                {
-                    Text(text = "Save", color = RecyclingBlue, fontSize = 17.sp)
-                }
 
                 Button(
                     onClick = {
@@ -216,39 +191,6 @@ class MainActivity : ComponentActivity() {
             }
 
         }
-    }
-
-    private fun signIn() {
-        val providers = arrayListOf(
-            AuthUI.IdpConfig.EmailBuilder().build(),
-            AuthUI.IdpConfig.GoogleBuilder().build()
-        )
-        val signInIntent = AuthUI.getInstance()
-            .createSignInIntentBuilder()
-            .setAvailableProviders(providers)
-            .build()
-        signInLauncher.launch(signInIntent)
-    }
-
-    private val signInLauncher = registerForActivityResult(
-        FirebaseAuthUIActivityResultContract()
-    ) { res -> this.signInResult(res) }
-
-
-    private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
-        val response = result.idpResponse
-        if (result.resultCode == RESULT_OK) {
-            firebaseUser = FirebaseAuth.getInstance().currentUser
-            firebaseUser?.let {
-                val user = User(it.uid, it.displayName)
-                viewModel.user = user
-                viewModel.saveUser()
-                viewModel.listenToFacility()
-            }
-        } else {
-            Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
-        }
-
     }
 
     private fun addFacility() {

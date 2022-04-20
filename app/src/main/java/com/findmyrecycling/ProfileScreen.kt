@@ -2,7 +2,6 @@ package com.findmyrecycling
 
 import android.Manifest
 import android.content.ContentValues
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -30,9 +29,16 @@ import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.findmyrecycling.dto.Facility
 import com.findmyrecycling.dto.Photo
+import com.findmyrecycling.dto.User
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 import com.findmyrecycling.ui.theme.RecyclingBlue
 import com.findmyrecycling.ui.theme.RecyclingGray
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.google.firebase.auth.FacebookAuthCredential
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.text.SimpleDateFormat
@@ -44,15 +50,22 @@ class ProfileScreen : ComponentActivity() {
     private var uri: Uri? = null
     private lateinit var currentImagePath: String
     private var strUri by mutableStateOf("")
+    private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            firebaseUser?.let {
+                val user = User(it.uid, "")
+                viewModel.user = user
+                viewModel.listenToFacility()
+            }
             FindMyRecyclingTheme {
                 Surface(
                     color = MaterialTheme.colors.background,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    ProfileOptions("Android")
+                    ProfileOptions("Android", viewModel.selectedFacility)
                 }
             }
         }
@@ -67,13 +80,15 @@ class ProfileScreen : ComponentActivity() {
     }
 
     @Composable
-    fun ProfileOptions(name: String) {
-        var inFacilityName by remember { mutableStateOf("") }
-        var inFacilityLocation by remember { mutableStateOf("") }
-        var inFacilityDetails by remember { mutableStateOf("") }
-        var inRecyclableProduct by remember { mutableStateOf("") }
+    fun ProfileOptions(
+        name: String,
+        selectedFacility: Facility = Facility()
+        ) {
+        var inFacilityName by remember(selectedFacility.facilityId) { mutableStateOf(selectedFacility.facilityName) }
+        var inFacilityLocation by remember(selectedFacility.location) { mutableStateOf(selectedFacility.location) }
+        var inFacilityDescription by remember(selectedFacility.description) { mutableStateOf(selectedFacility.description) }
+        var inRecyclableProduct by remember(selectedFacility.recyclableProducts) { mutableStateOf(selectedFacility.recyclableProducts) }
         val context = LocalContext.current
-
         Column {
             OutlinedTextField(
                 value = inFacilityName,
@@ -90,8 +105,8 @@ class ProfileScreen : ComponentActivity() {
                     .background(color = RecyclingGray)
             )
             OutlinedTextField(
-                value = inFacilityDetails,
-                onValueChange = { inFacilityDetails = it },
+                value = inFacilityDescription,
+                onValueChange = { inFacilityDescription = it },
                 label = { Text(stringResource(R.string.facilityDetails), fontSize = 17.sp, fontWeight = FontWeight.W800) },
                 modifier = Modifier.fillMaxWidth()
                     .background(color = RecyclingGray)
@@ -106,16 +121,16 @@ class ProfileScreen : ComponentActivity() {
             Row {
                 Button(
                     onClick = {
-                        var facility = Facility().apply {
-                            this.facilityName = inFacilityName
-                            this.location = inFacilityLocation
-                            this.description = inFacilityDetails
-                            this.recyclableProducts = inRecyclableProduct
+                        selectedFacility.apply {
+                            facilityName = inFacilityName
+                            location = inFacilityLocation
+                            description = inFacilityDescription
+                            recyclableProducts = inRecyclableProduct
                         }
                         viewModel.saveFacility()
                         Toast.makeText(
                             context,
-                            "$inFacilityName $inFacilityLocation $inFacilityDetails",
+                            "$inFacilityName $inFacilityLocation $inFacilityDescription",
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -129,6 +144,14 @@ class ProfileScreen : ComponentActivity() {
                 )
                 {
                     Text(text = "Photo")
+                }
+                Button(
+                    onClick = {
+                        signIn()
+                    }
+                )
+                {
+                    Text(text = "Log On")
                 }
             }
             AsyncImage(model = strUri, contentDescription = "Facility image")
@@ -209,7 +232,38 @@ class ProfileScreen : ComponentActivity() {
     private fun hasExternalStoragePermission() =
         ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
+    private fun signIn() {
+        val providers = arrayListOf(
+            AuthUI.IdpConfig.EmailBuilder().build(),
+            AuthUI.IdpConfig.GoogleBuilder().build()
+        )
+        val signInIntent = AuthUI.getInstance()
+            .createSignInIntentBuilder()
+            .setAvailableProviders(providers)
+            .build()
+        signInLauncher.launch(signInIntent)
+    }
 
+    private val signInLauncher = registerForActivityResult(
+        FirebaseAuthUIActivityResultContract()
+    ) { res -> this.signInResult(res) }
+
+
+    private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
+        val response = result.idpResponse
+        if (result.resultCode == RESULT_OK) {
+            firebaseUser = FirebaseAuth.getInstance().currentUser
+            firebaseUser?.let {
+                val user = User(it.uid, it.displayName)
+                viewModel.user = user
+                viewModel.saveUser()
+                viewModel.listenToFacility()
+            }
+        } else {
+            Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
+        }
+
+    }
 
     @Preview(showBackground = true)
     @Composable
