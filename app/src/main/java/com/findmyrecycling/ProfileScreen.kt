@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -23,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
@@ -56,14 +58,14 @@ class ProfileScreen : ComponentActivity() {
         }
     }
 
-
+/*
     @Composable
     fun MainMenu() {
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
             Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
         }
     }
-
+*/
     @Composable
     fun ProfileOptions(name: String) {
         var inFacilityName by remember { mutableStateOf("") }
