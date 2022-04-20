@@ -87,10 +87,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             viewModel.fetchProducts()
             val products by viewModel.products.observeAsState(initial = emptyList())
-            //val products = ArrayList<Product>()
-            //products.add(Product(product = "Tin Can", productId = 0))
-            //products.add(Product(product = "Car Door", productId = 1))
-            //products.add(Product(product = "Glass", productId = 2))
             firebaseUser?.let {
                 val user = User(it.uid, "")
                 viewModel.user = user
@@ -138,15 +134,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-/*
-    @Composable
-    fun ProfileMenu() {
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-            Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
-
-        }
-    }
-*/
 
 
     @Composable
@@ -160,31 +147,12 @@ class MainActivity : ComponentActivity() {
         }
 
         Column {
-
-            ProductSpinner(products = products)
             TextFieldWithDropdownUsage(dataIn = products,
                 "Recyclable",
                 3,
                 Product()
             )
 
-            /*OutlinedTextField(
-                value = recyclable,
-                onValueChange = { recyclable = it },
-                label = { Text(stringResource(R.string.recyclable), fontSize = 17.sp, fontWeight = W800) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
-                    .background(color = RecyclingGray)
-                    .border(
-                        width = 1.dp,
-                        color = Color.Black,
-                        shape = RoundedCornerShape(4.dp)
-                    ),
-
-            )
-
-             */
 
             OutlinedTextField(
                 value = location,
