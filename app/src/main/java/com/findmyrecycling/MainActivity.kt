@@ -1,72 +1,33 @@
 package com.findmyrecycling
 
-import android.Manifest
-import android.content.ContentValues
-import android.content.ContentValues.TAG
+
 import android.content.Intent
-import android.content.pm.PackageManager.PERMISSION_GRANTED
-import android.graphics.drawable.Drawable
-import android.media.Image
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
-import android.view.View
-import android.widget.ImageView
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.W800
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
-import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
-import androidx.core.content.res.ResourcesCompat
-import androidx.lifecycle.ViewModel
 import coil.compose.AsyncImage
-import com.findmyrecycling.dto.Facility
-import com.findmyrecycling.dto.Photo
 import com.findmyrecycling.dto.Product
-import com.findmyrecycling.dto.User
-import com.findmyrecycling.ui.theme.*
-import com.google.common.collect.Collections2.filter
-import com.google.common.collect.Iterables.filter
-import com.google.common.collect.Iterators.filter
-import com.google.common.collect.Multisets.filter
-import com.google.common.collect.Sets.filter
-import java.util.Locale.filter
-import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
-import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
+import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
+import com.findmyrecycling.ui.theme.RecyclingBlue
+import com.findmyrecycling.ui.theme.RecyclingGray
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -95,9 +56,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun RecycleSearch(name: String, products : List<Product> = ArrayList<Product>(), selectedProduct: Product = Product()) {
-        var recyclable by remember (selectedProduct.productId){ mutableStateOf(selectedProduct.product) }
         var location by remember { mutableStateOf("") }
-        val context = LocalContext.current
         Row {
             Arrangement.Center
         }
@@ -198,7 +157,6 @@ class MainActivity : ComponentActivity() {
                             onDismissRequest()
                     },
                 value = value,
-                //fontWeight =W800,
                 onValueChange = setValue,
                 label = { Text((label), fontSize = 17.sp, fontWeight = W800) },
                 colors = TextFieldDefaults.outlinedTextFieldColors()

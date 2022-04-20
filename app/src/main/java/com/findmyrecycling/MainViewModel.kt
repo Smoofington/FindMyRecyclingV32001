@@ -1,6 +1,5 @@
 package com.findmyrecycling
 
-import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.net.Uri
 import android.util.Log
@@ -100,7 +99,7 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
 
     private fun uploadPhotos() {
         photos.forEach { photo ->
-            var uri = Uri.parse(photo.localUri)
+            val uri = Uri.parse(photo.localUri)
             val imageRef = storageReference.child("images/${user?.uid}/${uri.lastPathSegment}")
             val uploadTask = imageRef.putFile(uri)
             uploadTask.addOnSuccessListener {
@@ -119,7 +118,7 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
 
     internal fun updatePhotoDatabase(photo: Photo) {
         user?.let { user ->
-            var photoDocument = if (photo.id.isEmpty()) {
+            val photoDocument = if (photo.id.isEmpty()) {
                 // if there is no existing photo create new
                 firestore.collection("users").document(user.uid).collection("facilities")
                     .document(selectedFacility.facilityId).collection("photos")
@@ -131,7 +130,7 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
                     .document(photo.id)
             }
             photo.id = photoDocument.id
-            var handle = photoDocument.set(photo)
+            val handle = photoDocument.set(photo)
             handle.addOnSuccessListener {
                 Log.i(TAG, "Successfully updated photo metadata")
                 firestore.collection("users").document(user.uid).collection("facilities")
@@ -139,7 +138,7 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
                     .set(photo)
             }
             handle.addOnFailureListener {
-                Log.e(ContentValues.TAG, "Error updating photo data: ${it.message}")
+                Log.e(TAG, "Error updating photo data: ${it.message}")
             }
         }
     }
@@ -153,17 +152,20 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
     }
 
     fun fetchPhotos() {
+        photos.clear()
         user?.let { user ->
-            var photoCollection =
+            val photoCollection =
                 firestore.collection("users").document(user.uid).collection("facilities")
                     .document(selectedFacility.facilityId).collection("photos")
             photoCollection.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
-                querySnapshot?.let { querySnapshot ->
-                    var documents = querySnapshot.documents
+                querySnapshot?.let {
+                        querySnapshot ->
+                    val documents = querySnapshot.documents
                     val inPhotos = ArrayList<Photo>()
                     documents?.forEach {
                         val photo = it.toObject(Photo::class.java)
-                        photo?.let { photo ->
+                        photo?.let {
+                                photo ->
                             inPhotos.add(photo)
                         }
                     }
@@ -190,9 +192,4 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
                 }
         }
     }
-
-    fun clearPhotos() {
-        photos.clear()
-    }
-
 }

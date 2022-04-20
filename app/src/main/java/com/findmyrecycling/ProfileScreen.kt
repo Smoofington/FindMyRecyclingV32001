@@ -3,7 +3,6 @@ package com.findmyrecycling
 import android.Manifest
 import android.content.ContentValues
 import android.content.pm.PackageManager
-import android.media.metrics.Event
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -41,7 +40,6 @@ import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.findmyrecycling.dto.Facility
 import com.findmyrecycling.dto.Photo
-import com.findmyrecycling.dto.Product
 import com.findmyrecycling.dto.User
 import com.findmyrecycling.ui.theme.FindMyRecyclingTheme
 import com.findmyrecycling.ui.theme.RecyclingBlue
@@ -55,7 +53,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class ProfileScreen : ComponentActivity() {
 
@@ -87,70 +84,93 @@ class ProfileScreen : ComponentActivity() {
         }
     }
 
-@Composable
-fun FacilitySpinner(facility: List<Facility>) {
-    var facilityText by remember { mutableStateOf("My Facilities") }
-    var expanded by remember { mutableStateOf(false) }
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Row(Modifier
-            .padding(24.dp)
-            .clickable {
-                expanded = !expanded
-            }
-            .padding(8.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = facilityText, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
-            Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
-            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                facility.forEach { facility ->
-                    DropdownMenuItem(onClick = {
-                        expanded = false
-                        if (facility.facilityName == viewModel.NEW_FACILITY) {
-                            // we have a new facility
-                            facilityText = "Add New Facility"
-                            facility.facilityName = ""
-                            viewModel.selectedFacility = facility
-                        } else {
-                            // we have selected an existing specimen
-                            facilityText = facility.toString()
-                            selectedFacility = Facility(
-                                facilityName = "",
-                                location = "",
-                                description = "",
-                                recyclableProducts = ""
-                            )
-                            inFacilityName = facility.facilityName
-                            viewModel.selectedFacility = facility
-                            viewModel.fetchPhotos()
-                        }
+    @Composable
+    fun FacilitySpinner(facility: List<Facility>) {
+        var facilityText by remember { mutableStateOf("My Facilities") }
+        var expanded by remember { mutableStateOf(false) }
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Row(Modifier
+                .padding(24.dp)
+                .clickable {
+                    expanded = !expanded
+                }
+                .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = facilityText, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
+                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
+                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    facility.forEach { facility ->
+                        DropdownMenuItem(onClick = {
+                            expanded = false
+                            if (facility.facilityName == viewModel.NEW_FACILITY) {
+                                // we have a new facility
+                                facilityText = "Add New Facility"
+                                facility.facilityName = ""
+                                viewModel.selectedFacility = facility
+                            } else {
+                                // we have selected an existing specimen
+                                facilityText = facility.toString()
+                                selectedFacility = Facility(
+                                    facilityName = "",
+                                    location = "",
+                                    description = "",
+                                    recyclableProducts = ""
+                                )
+                                inFacilityName = facility.facilityName
+                                viewModel.selectedFacility = facility
+                                viewModel.fetchPhotos()
+                            }
 
-                    }) {
-                        Text(text = facility.toString())
+                        }) {
+                            Text(text = facility.toString())
+                        }
                     }
                 }
             }
         }
     }
-}
+
     @Composable
     fun ProfileOptions(
         name: String,
         facility: List<Facility> = ArrayList<Facility>(),
         selectedFacility: Facility = Facility()
-        ) {
-        var inFacilityName by remember(selectedFacility.facilityId) { mutableStateOf(selectedFacility.facilityName) }
-        var inFacilityLocation by remember(selectedFacility.location) { mutableStateOf(selectedFacility.location) }
-        var inFacilityDescription by remember(selectedFacility.description) { mutableStateOf(selectedFacility.description) }
-        var inRecyclableProduct by remember(selectedFacility.recyclableProducts) { mutableStateOf(selectedFacility.recyclableProducts) }
+    ) {
+        var inFacilityName by remember(selectedFacility.facilityId) {
+            mutableStateOf(
+                selectedFacility.facilityName
+            )
+        }
+        var inFacilityLocation by remember(selectedFacility.location) {
+            mutableStateOf(
+                selectedFacility.location
+            )
+        }
+        var inFacilityDescription by remember(selectedFacility.description) {
+            mutableStateOf(
+                selectedFacility.description
+            )
+        }
+        var inRecyclableProduct by remember(selectedFacility.recyclableProducts) {
+            mutableStateOf(
+                selectedFacility.recyclableProducts
+            )
+        }
         val context = LocalContext.current
         Column {
             FacilitySpinner(facility = facility)
             OutlinedTextField(
                 value = inFacilityName,
                 onValueChange = { inFacilityName = it },
-                label = { Text(stringResource(R.string.facilityName), fontSize = 17.sp, fontWeight = FontWeight.W800) },
+                label = {
+                    Text(
+                        stringResource(R.string.facilityName),
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.W800
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxWidth()
@@ -165,7 +185,13 @@ fun FacilitySpinner(facility: List<Facility>) {
             OutlinedTextField(
                 value = inFacilityLocation,
                 onValueChange = { inFacilityLocation = it },
-                label = { Text(stringResource(R.string.facilityLocation), fontSize = 17.sp, fontWeight = FontWeight.W800) },
+                label = {
+                    Text(
+                        stringResource(R.string.facilityLocation),
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.W800
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxWidth()
@@ -180,7 +206,13 @@ fun FacilitySpinner(facility: List<Facility>) {
             OutlinedTextField(
                 value = inFacilityDescription,
                 onValueChange = { inFacilityDescription = it },
-                label = { Text(stringResource(R.string.facilityDetails), fontSize = 17.sp, fontWeight = FontWeight.W800) },
+                label = {
+                    Text(
+                        stringResource(R.string.facilityDetails),
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.W800
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxWidth()
@@ -195,7 +227,13 @@ fun FacilitySpinner(facility: List<Facility>) {
             OutlinedTextField(
                 value = inRecyclableProduct,
                 onValueChange = { inRecyclableProduct = it },
-                label = { Text(stringResource(R.string.recyclableProduct), fontSize = 17.sp, fontWeight = FontWeight.W800) },
+                label = {
+                    Text(
+                        stringResource(R.string.recyclableProduct),
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.W800
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxWidth()
@@ -207,8 +245,10 @@ fun FacilitySpinner(facility: List<Facility>) {
                         shape = RoundedCornerShape(4.dp)
                     ),
             )
-            Row(modifier = Modifier
-                .padding(start = 4.dp)) {
+            Row(
+                modifier = Modifier
+                    .padding(start = 4.dp)
+            ) {
                 Button(
                     onClick = {
                         selectedFacility.apply {
@@ -220,7 +260,7 @@ fun FacilitySpinner(facility: List<Facility>) {
                         viewModel.saveFacility()
                         Toast.makeText(
                             context,
-                            "$inFacilityName $inFacilityLocation $inFacilityDescription",
+                            "Saved Facility",
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -254,7 +294,7 @@ fun FacilitySpinner(facility: List<Facility>) {
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             modifier = Modifier.fillMaxHeight()
-            ) {
+        ) {
             items(
                 items = photos,
                 itemContent = {
@@ -268,7 +308,9 @@ fun FacilitySpinner(facility: List<Facility>) {
     fun EventListItem(photo: Photo) {
         var inDescription by remember(photo.id) { mutableStateOf(photo.description) }
         Card(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(horizontal = 8.dp, vertical = 8.dp)
+                .fillMaxWidth(),
             elevation = 8.dp,
             backgroundColor = MaterialTheme.colors.background,
             shape = RoundedCornerShape(20.dp),
@@ -285,7 +327,10 @@ fun FacilitySpinner(facility: List<Facility>) {
 
                 Column(Modifier.weight(4f)) {
                     Text(text = photo.id, style = MaterialTheme.typography.h6)
-                    Text(text = photo.dateTaken.toString(), style = MaterialTheme.typography.caption)
+                    Text(
+                        text = photo.dateTaken.toString(),
+                        style = MaterialTheme.typography.caption
+                    )
                     OutlinedTextField(
                         value = inDescription,
                         onValueChange = { inDescription = it },
@@ -347,6 +392,7 @@ fun FacilitySpinner(facility: List<Facility>) {
             )
         }
     }
+
     private val requestMultiplePermissionsLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { resultsMap ->
@@ -373,7 +419,6 @@ fun FacilitySpinner(facility: List<Facility>) {
             uri = FileProvider.getUriForFile(this, "com.findmyrecycling.fileprovider", file)
         } catch (e: Exception) {
             Log.e(ContentValues.TAG, "Error: ${e.message}")
-            var foo = e.message
         }
         getCameraImage.launch(uri)
     }
@@ -402,7 +447,9 @@ fun FacilitySpinner(facility: List<Facility>) {
             }
         }
 
-    private fun hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+    private fun hasCameraPermission() =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+
     private fun hasExternalStoragePermission() =
         ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
