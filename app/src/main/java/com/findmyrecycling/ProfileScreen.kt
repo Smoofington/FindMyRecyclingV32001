@@ -111,6 +111,7 @@ fun FacilitySpinner(facility: List<Facility>) {
                             // we have a new facility
                             facilityText = "Add New Facility"
                             facility.facilityName = ""
+                            viewModel.selectedFacility = facility
                         } else {
                             // we have selected an existing specimen
                             facilityText = facility.toString()
@@ -121,9 +122,10 @@ fun FacilitySpinner(facility: List<Facility>) {
                                 recyclableProducts = ""
                             )
                             inFacilityName = facility.facilityName
+                            viewModel.selectedFacility = facility
+                            viewModel.fetchPhotos()
                         }
-                        viewModel.selectedFacility = facility
-                        viewModel.fetchProducts()
+
                     }) {
                         Text(text = facility.toString())
                     }

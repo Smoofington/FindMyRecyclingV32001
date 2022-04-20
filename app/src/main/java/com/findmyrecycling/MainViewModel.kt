@@ -32,8 +32,8 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
     var selectedFacility by mutableStateOf(Facility())
     var user: User? = null
 
-    val storageReference = FirebaseStorage.getInstance().getReference()
-    lateinit var firestore: FirebaseFirestore
+    private val storageReference = FirebaseStorage.getInstance().getReference()
+    private lateinit var firestore: FirebaseFirestore
 
     init {
         firestore = FirebaseFirestore.getInstance()
@@ -56,7 +56,7 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
                         ALL_FACILITIES.add(Facility(facilityName = NEW_FACILITY))
                         val DOCUMENTS = snapshot.documents
                         DOCUMENTS.forEach {
-                            var facility = it.toObject(Facility::class.java)
+                            val facility = it.toObject(Facility::class.java)
                             facility?.let {
                                 ALL_FACILITIES.add(it)
                             }
@@ -198,6 +198,10 @@ class MainViewModel(var productService: IProductService = ProductService()) : Vi
                     Log.e(TAG, "Photo delete failed. ${it.message}")
                 }
         }
+    }
+
+    fun clearPhotos() {
+        photos.clear()
     }
 
 }
