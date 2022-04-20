@@ -161,7 +161,7 @@ class MainActivity : ComponentActivity() {
 
         Column {
 
-            ProductSpinner(products = products)
+           //ProductSpinner(products = products)
             TextFieldWithDropdownUsage(dataIn = products,
                 "Recyclable",
                 3,
