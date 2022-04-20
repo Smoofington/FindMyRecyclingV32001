@@ -250,6 +250,8 @@ class ProfileScreen : ComponentActivity() {
                     .padding(start = 4.dp)
             ) {
                 Button(
+                    modifier = Modifier
+                        .padding(start = 2.dp, top = 2.dp, end = 2.dp),
                     onClick = {
                         selectedFacility.apply {
                             facilityName = inFacilityName
@@ -268,14 +270,19 @@ class ProfileScreen : ComponentActivity() {
                     Text(text = "Save", color = RecyclingBlue, fontSize = 17.sp)
                 }
                 Button(
+                    modifier = Modifier
+                        .padding(top = 2.dp, end = 2.dp),
                     onClick = {
                         takePhoto()
                     }
                 )
                 {
+
                     Text(text = "Photo", color = RecyclingBlue, fontSize = 17.sp)
                 }
                 Button(
+                    modifier = Modifier
+                        .padding(top = 2.dp, end = 2.dp),
                     onClick = {
                         signIn()
                     }
@@ -314,7 +321,7 @@ class ProfileScreen : ComponentActivity() {
             elevation = 8.dp,
             backgroundColor = MaterialTheme.colors.background,
             shape = RoundedCornerShape(20.dp),
-            border = BorderStroke(1.dp, Color.Green)
+            border = BorderStroke(1.dp, Color.DarkGray)
         )
         {
             Row {
@@ -349,7 +356,8 @@ class ProfileScreen : ComponentActivity() {
                         Icon(
                             imageVector = Icons.Filled.Check,
                             contentDescription = stringResource(R.string.Save),
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp),
+                            tint = Color.DarkGray
                         )
                     }
                     Button(
@@ -361,7 +369,8 @@ class ProfileScreen : ComponentActivity() {
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = stringResource(R.string.Delete),
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp),
+                            tint = Color.DarkGray
                         )
                     }
                 }
