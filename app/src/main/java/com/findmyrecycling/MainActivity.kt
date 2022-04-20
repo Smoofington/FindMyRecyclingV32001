@@ -147,7 +147,8 @@ class MainActivity : ComponentActivity() {
         }
 
         Column {
-            TextFieldWithDropdownUsage(dataIn = products,
+            TextFieldWithDropdownUsage(
+                dataIn = products,
                 "Recyclable",
                 3,
                 Product()
@@ -169,7 +170,7 @@ class MainActivity : ComponentActivity() {
                     ),
             )
             Row(modifier = Modifier
-                .padding(all = 2.dp) // maybe make 10
+                .padding(start = 4.dp)
 
             ) {
                 Button(
@@ -236,7 +237,7 @@ class MainActivity : ComponentActivity() {
     fun TextFieldWithDropdown(
         modifier: Modifier = Modifier,
         value: TextFieldValue,
-        //fontSize: IntrinsicSize,
+        //fontWeight: FontWeight,
         setValue: (TextFieldValue) -> Unit,
         onDismissRequest: () -> Unit,
         dropDownExpanded: Boolean,
@@ -252,9 +253,9 @@ class MainActivity : ComponentActivity() {
                             onDismissRequest()
                     },
                 value = value,
-
+                //fontWeight =W800,
                 onValueChange = setValue,
-                label = { Text(label) },
+                label = { Text((label), fontSize = 17.sp, fontWeight = W800) },
                 colors = TextFieldDefaults.outlinedTextFieldColors()
 
             )

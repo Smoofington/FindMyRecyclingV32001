@@ -179,7 +179,7 @@ fun ProductSpinner(products: List<Product>) {
                     ),
             )
             Row(modifier = Modifier
-                .padding(all = 2.dp)) {
+                .padding(start = 4.dp)) {
                 Button(
                     onClick = {
                         selectedFacility.apply {
