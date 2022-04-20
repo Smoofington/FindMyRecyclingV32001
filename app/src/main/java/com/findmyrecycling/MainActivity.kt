@@ -174,22 +174,6 @@ class MainActivity : ComponentActivity() {
             ) {
                 Button(
                     onClick = {
-                        viewModel.saveFacility()
-                    }
-                )
-                {
-                    Text(text = "Save", color = RecyclingBlue, fontSize = 17.sp)
-                }
-                Button(
-                    onClick = {
-                        takePhoto()
-                    }
-                )
-                {
-                    Text(text = "Photo", color = RecyclingBlue, fontSize = 17.sp)
-                }
-                Button(
-                    onClick = {
                         addFacility()
                     }
                 )
@@ -386,39 +370,6 @@ class MainActivity : ComponentActivity() {
         FindMyRecyclingTheme {
             RecycleSearch("Android")
         }
-    }
-
-    private fun signIn() {
-        val providers = arrayListOf(
-            AuthUI.IdpConfig.EmailBuilder().build(),
-            AuthUI.IdpConfig.GoogleBuilder().build()
-        )
-        val signInIntent = AuthUI.getInstance()
-            .createSignInIntentBuilder()
-            .setAvailableProviders(providers)
-            .build()
-        signInLauncher.launch(signInIntent)
-    }
-
-    private val signInLauncher = registerForActivityResult(
-        FirebaseAuthUIActivityResultContract()
-    ) { res -> this.signInResult(res) }
-
-
-    private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
-        val response = result.idpResponse
-        if (result.resultCode == RESULT_OK) {
-            firebaseUser = FirebaseAuth.getInstance().currentUser
-            firebaseUser?.let {
-                val user = User(it.uid, it.displayName)
-                viewModel.user = user
-                viewModel.saveUser()
-                viewModel.listenToFacility()
-            }
-        } else {
-            Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
-        }
-
     }
 
     private fun addFacility() {

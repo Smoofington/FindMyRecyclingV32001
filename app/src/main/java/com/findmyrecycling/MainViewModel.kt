@@ -24,14 +24,14 @@ import kotlinx.coroutines.launch
 class MainViewModel(var productService: IProductService = ProductService()) : ViewModel() {
 
     val photos: ArrayList<Photo> = ArrayList<Photo>()
-    private val NEW_FACILITY = "New Facility"
+    val NEW_FACILITY = "New Facility"
     var products: MutableLiveData<List<Product>> = MutableLiveData<List<Product>>()
     var facility: MutableLiveData<List<Facility>> = MutableLiveData<List<Facility>>()
     var selectedFacility by mutableStateOf(Facility())
     var user: User? = null
 
-    lateinit var firestore: FirebaseFirestore
     val storageReference = FirebaseStorage.getInstance().getReference()
+    lateinit var firestore: FirebaseFirestore
 
     init {
         firestore = FirebaseFirestore.getInstance()
